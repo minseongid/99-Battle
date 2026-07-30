@@ -360,8 +360,10 @@ export default function RoomPage() {
               )
             })}
           </div>
+        </div>
 
-          <div className="mt-2 flex items-center gap-2">
+        <div className="mt-[var(--room-section-gap)] rounded-[var(--radius-card)] bg-[var(--color-surface)] p-[var(--room-pad)] shadow-sm">
+          <div className="flex items-center gap-2">
             <Gamepad2 size={16} className="text-[var(--color-primary)]" />
             <span className="text-sm font-bold text-[var(--color-ink)]">스테이지 개수</span>
             {!isHost && <span className="ml-auto text-[11px] text-[var(--color-muted)]">방장만 변경 가능</span>}
@@ -386,6 +388,7 @@ export default function RoomPage() {
               )
             })}
           </div>
+          <p className="mt-2 text-xs text-[var(--color-muted)]">선택한 스테이지 개수로 연산 배틀이 진행돼요!</p>
         </div>
 
         {isHost ? (
