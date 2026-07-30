@@ -213,7 +213,7 @@ export default function RoomPage() {
             <img
               src={battleStart}
               alt="배틀 시작"
-              className="w-[68%] max-w-[280px] animate-[battle-pop_0.5s_ease-out] drop-shadow-2xl"
+              className="w-[88%] max-w-[380px] animate-[battle-pop_0.5s_ease-out] drop-shadow-2xl"
             />
           </div>
         )}
