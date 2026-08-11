@@ -103,8 +103,8 @@ export default function LobbyPage() {
 
   return (
     <PageShell>
-      <div className="relative flex w-full flex-1 flex-col px-5 pt-6 pb-6">
-        <header className="flex items-center gap-3">
+      <div className="relative flex h-dvh w-full flex-col overflow-hidden px-5 pt-6 pb-6">
+        <header className="flex shrink-0 items-center gap-3">
           <button
             type="button"
             onClick={() => navigate('/')}
@@ -115,9 +115,9 @@ export default function LobbyPage() {
           <h1 className="text-xl font-extrabold text-[var(--color-ink)]">공개방</h1>
         </header>
 
-        {error && <p className="mt-4 text-sm font-medium text-[var(--color-error)]">{error}</p>}
+        {error && <p className="mt-4 shrink-0 text-sm font-medium text-[var(--color-error)]">{error}</p>}
 
-        <div className="mt-5 flex flex-1 flex-col gap-3">
+        <div className="mt-5 flex flex-1 flex-col gap-3 overflow-y-auto">
           {loading && <p className="text-sm text-[var(--color-muted)]">불러오는 중...</p>}
           {!loading && rooms.length === 0 && (
             <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
@@ -141,7 +141,7 @@ export default function LobbyPage() {
           {rooms.map((room) => (
             <div
               key={room.roomId}
-              className="flex items-center justify-between rounded-[var(--radius-card)] bg-[var(--color-surface)] px-5 py-4 shadow-sm"
+              className="flex shrink-0 items-center justify-between rounded-[var(--radius-card)] bg-[var(--color-surface)] px-5 py-4 shadow-sm"
             >
               <div>
                 <p className="font-bold text-[var(--color-ink)]">{room.roomName}</p>
@@ -161,7 +161,7 @@ export default function LobbyPage() {
           ))}
         </div>
 
-        <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-[var(--color-muted)]">
+        <p className="mt-4 flex shrink-0 items-center justify-center gap-1.5 text-center text-xs text-[var(--color-muted)]">
           <Lightbulb size={14} />
           방 인원은 최대 6명까지예요!
         </p>
