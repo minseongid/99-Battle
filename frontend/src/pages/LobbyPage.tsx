@@ -160,7 +160,7 @@ export default function LobbyPage() {
             </div>
           ))}
           {!loading && rooms.length > 0 && (
-            <p className="mt-1 flex shrink-0 items-center justify-center gap-1.5 pb-2 text-center text-xs text-[var(--color-muted)]">
+            <p className="mt-1 flex shrink-0 items-center justify-center gap-1.5 pb-8 text-center text-xs text-[var(--color-muted)]">
               <Lightbulb size={14} />
               방 인원은 최대 6명까지예요!
             </p>
