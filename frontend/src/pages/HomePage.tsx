@@ -60,7 +60,7 @@ export default function HomePage() {
 
   return (
     <PageShell>
-      <div className="flex w-full flex-col px-6 pt-8 pb-6">
+      <div className="flex w-full flex-col px-6 pt-[var(--home-pt)] pb-6">
         <header className="text-center">
           <img src={brandLogo} alt="99 Battle" className="mx-auto w-[92%] max-w-[380px]" />
           <p className="mt-1 text-base font-semibold text-[var(--color-muted)]">
@@ -68,11 +68,11 @@ export default function HomePage() {
           </p>
         </header>
 
-        <div className="my-4 flex justify-center">
+        <div className="my-[var(--home-mascot-my)] flex justify-center">
           <img
             src={penguinLanding}
             alt="99 Battle 마스코트"
-            className="w-full max-w-[200px]"
+            className="w-full max-w-[var(--home-mascot-size)]"
           />
         </div>
 
@@ -124,7 +124,7 @@ export default function HomePage() {
           </button>
         </div>
 
-        <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs text-[var(--color-muted)]">
+        <p className="mt-[var(--home-footer-mt)] flex items-center justify-center gap-1.5 text-center text-xs text-[var(--color-muted)]">
           <ShieldCheck size={14} />
           욕설 및 부정행위는 제재될 수 있습니다.
         </p>
