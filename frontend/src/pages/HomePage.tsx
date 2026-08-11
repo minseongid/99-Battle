@@ -6,6 +6,7 @@ import brandLogo from '../assets/brand-logo.png'
 import PageShell from '../components/PageShell'
 import { getNickname, setNickname } from '../lib/session'
 import { apiGet } from '../lib/api'
+import { playLobbyMusic } from '../lib/audio'
 import type { NicknameAvailabilityResponse } from '../types/room'
 
 const NICKNAME_MAX_LENGTH = 10
@@ -55,6 +56,7 @@ export default function HomePage() {
 
   async function handlePublicRooms() {
     if (!(await commitNickname())) return
+    playLobbyMusic()
     navigate('/lobby?mode=public')
   }
 

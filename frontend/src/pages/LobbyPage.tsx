@@ -4,6 +4,7 @@ import { ArrowLeft, Users, RefreshCw, Plus, Lightbulb, DoorOpen } from 'lucide-r
 import { apiGet, apiPost } from '../lib/api'
 import { getNickname, getPlayerId } from '../lib/session'
 import { subscribeToPublicRooms } from '../lib/ws'
+import { playLobbyMusic } from '../lib/audio'
 import PageShell from '../components/PageShell'
 import type { PublicRoomSummary, RoomResponse } from '../types/room'
 
@@ -24,7 +25,10 @@ export default function LobbyPage() {
     }
     if (mode === 'quick') {
       apiPost<RoomResponse>('/api/rooms/quick-match', { playerId: getPlayerId(), nickname })
-        .then((room) => navigate(`/room/${room.roomId}`, { replace: true }))
+        .then((room) => {
+          playLobbyMusic()
+          navigate(`/room/${room.roomId}`, { replace: true })
+        })
         .catch((err: Error) => setError(err.message))
     } else {
       loadPublicRooms()
