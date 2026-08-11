@@ -103,7 +103,7 @@ export default function LobbyPage() {
 
   return (
     <PageShell>
-      <div className="relative flex h-dvh w-full flex-col overflow-hidden px-5 pt-6 pb-6">
+      <div className="relative flex h-dvh w-full flex-col overflow-hidden px-5 pt-6 pb-6 sm:h-[calc(100vh-4rem)]">
         <header className="flex shrink-0 items-center gap-3">
           <button
             type="button"
@@ -117,7 +117,7 @@ export default function LobbyPage() {
 
         {error && <p className="mt-4 shrink-0 text-sm font-medium text-[var(--color-error)]">{error}</p>}
 
-        <div className="mt-5 flex flex-1 flex-col gap-3 overflow-y-auto">
+        <div className="custom-scroll mt-5 flex flex-1 flex-col gap-3 overflow-y-auto">
           {loading && <p className="text-sm text-[var(--color-muted)]">불러오는 중...</p>}
           {!loading && rooms.length === 0 && (
             <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
@@ -159,12 +159,13 @@ export default function LobbyPage() {
               </button>
             </div>
           ))}
+          {!loading && rooms.length > 0 && (
+            <p className="mt-1 flex shrink-0 items-center justify-center gap-1.5 pb-2 text-center text-xs text-[var(--color-muted)]">
+              <Lightbulb size={14} />
+              방 인원은 최대 6명까지예요!
+            </p>
+          )}
         </div>
-
-        <p className="mt-4 flex shrink-0 items-center justify-center gap-1.5 text-center text-xs text-[var(--color-muted)]">
-          <Lightbulb size={14} />
-          방 인원은 최대 6명까지예요!
-        </p>
 
         {rooms.length > 0 && (
           <button
