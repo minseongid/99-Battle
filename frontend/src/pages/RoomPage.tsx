@@ -209,7 +209,7 @@ export default function RoomPage() {
     <PageShell>
       <div className="relative flex w-full flex-1 flex-col px-5 pt-[var(--room-outer-pad)] pb-[var(--room-outer-pad)]">
         {showBattleStart && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/35 backdrop-blur-sm">
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/35 pb-[22%] backdrop-blur-sm">
             <img
               src={battleStart}
               alt="배틀 시작"

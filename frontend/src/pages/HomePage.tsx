@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Zap, Users, User, ShieldCheck } from 'lucide-react'
+import { Zap, Users, User, ShieldCheck, Play } from 'lucide-react'
 import penguinLanding from '../assets/penguin-landing2.png'
 import brandLogo from '../assets/brand-logo.png'
 import PageShell from '../components/PageShell'
 import { getNickname, setNickname } from '../lib/session'
 import { apiGet } from '../lib/api'
-import { playLobbyMusic } from '../lib/audio'
+import { hasStartedLobbyMusic, playLobbyMusic } from '../lib/audio'
 import type { NicknameAvailabilityResponse } from '../types/room'
 
 const NICKNAME_MAX_LENGTH = 10
@@ -16,6 +16,7 @@ export default function HomePage() {
   const [nickname, setNicknameInput] = useState(getNickname())
   const [error, setError] = useState('')
   const [checking, setChecking] = useState(false)
+  const [entered, setEntered] = useState(hasStartedLobbyMusic())
 
   const trimmed = nickname.trim()
   const canStart = trimmed.length > 0
@@ -56,13 +57,36 @@ export default function HomePage() {
 
   async function handlePublicRooms() {
     if (!(await commitNickname())) return
-    playLobbyMusic()
     navigate('/lobby?mode=public')
+  }
+
+  function handleEnter() {
+    playLobbyMusic()
+    setEntered(true)
   }
 
   return (
     <PageShell>
-      <div className="flex w-full flex-col px-6 pt-[var(--home-pt)] pb-6">
+      <div className="relative flex w-full flex-col px-6 pt-[var(--home-pt)] pb-6">
+        {!entered && (
+          <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-black/35 pb-[10%] backdrop-blur-sm">
+            <img
+              src={penguinLanding}
+              alt=""
+              className="w-[38%] max-w-[150px] animate-[battle-pop_0.5s_ease-out] drop-shadow-2xl"
+            />
+            <button
+              type="button"
+              onClick={handleEnter}
+              className="flex items-center gap-2 rounded-[var(--radius-card)] bg-[var(--color-primary)] px-8 py-4 text-base font-bold text-white shadow-[0_8px_20px_-8px_var(--color-primary)] transition active:scale-[0.98]"
+            >
+              <Play size={20} fill="currentColor" />
+              게임 시작
+            </button>
+            <p className="text-sm font-semibold text-white/90">탭해서 시작해요!</p>
+          </div>
+        )}
+
         <header className="text-center">
           <img src={brandLogo} alt="99 Battle" className="mx-auto w-[92%] max-w-[380px]" />
           <p className="mt-1 text-base font-semibold text-[var(--color-muted)]">

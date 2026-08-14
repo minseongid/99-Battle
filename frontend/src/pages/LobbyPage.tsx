@@ -31,6 +31,7 @@ export default function LobbyPage() {
         })
         .catch((err: Error) => setError(err.message))
     } else {
+      playLobbyMusic()
       loadPublicRooms()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
