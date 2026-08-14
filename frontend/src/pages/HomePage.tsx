@@ -67,14 +67,9 @@ export default function HomePage() {
 
   return (
     <PageShell>
-      <div className="relative flex w-full flex-col px-6 pt-[var(--home-pt)] pb-6">
+      <div className="relative flex w-full flex-1 flex-col px-6 pt-[var(--home-pt)] pb-6">
         {!entered && (
-          <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-black/35 pb-[10%] backdrop-blur-sm">
-            <img
-              src={penguinLanding}
-              alt=""
-              className="w-[38%] max-w-[150px] animate-[battle-pop_0.5s_ease-out] drop-shadow-2xl"
-            />
+          <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-[var(--color-bg)]">
             <button
               type="button"
               onClick={handleEnter}
@@ -83,7 +78,7 @@ export default function HomePage() {
               <Play size={20} fill="currentColor" />
               게임 시작
             </button>
-            <p className="text-sm font-semibold text-white/90">탭해서 시작해요!</p>
+            <p className="text-sm font-semibold text-[var(--color-muted)]">탭해서 시작해요!</p>
           </div>
         )}
 
