@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Zap, Users, User, ShieldCheck, Play } from 'lucide-react'
 import penguinLanding from '../assets/penguin-landing2.png'
 import brandLogo from '../assets/brand-logo.png'
+import gamestart from '../assets/gamestart.png'
 import PageShell from '../components/PageShell'
 import { getNickname, setNickname } from '../lib/session'
 import { apiGet } from '../lib/api'
@@ -70,6 +71,11 @@ export default function HomePage() {
       <div className="relative flex w-full flex-1 flex-col px-6 pt-[var(--home-pt)] pb-6">
         {!entered && (
           <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-[var(--color-bg)]">
+            <img
+              src={gamestart}
+              alt=""
+              className="w-[55%] max-w-[220px] animate-[battle-pop_0.5s_ease-out]"
+            />
             <button
               type="button"
               onClick={handleEnter}
@@ -93,7 +99,7 @@ export default function HomePage() {
           <img
             src={penguinLanding}
             alt="99 Battle 마스코트"
-            className="w-full max-w-[var(--home-mascot-size)]"
+            className="w-full max-w-[var(--home-mascot-size)] sm:max-w-[320px]"
           />
         </div>
 
