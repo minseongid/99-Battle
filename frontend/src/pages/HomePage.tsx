@@ -74,7 +74,7 @@ export default function HomePage() {
             <img
               src={gamestart}
               alt=""
-              className="w-[55%] max-w-[220px] animate-[battle-pop_0.5s_ease-out]"
+              className="w-[78%] max-w-[320px] animate-[battle-pop_0.5s_ease-out]"
             />
             <button
               type="button"
