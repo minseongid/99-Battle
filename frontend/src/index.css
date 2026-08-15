@@ -76,6 +76,19 @@ textarea {
 
   --lobby-outer-pad: 1.5rem;
   --lobby-list-mt: 1.25rem;
+
+  --game-outer-pad: 1.25rem;
+  --game-header-mb: 1rem;
+  --game-question-my: 1.5rem;
+  --game-question-text: 2.25rem;
+  --keypad-gap: 0.625rem;
+  --keypad-key-h: 3.25rem;
+  --keypad-confirm-h: 3.25rem;
+
+  --result-outer-pad: 1.5rem;
+  --result-podium-gap: 0.75rem;
+  --result-list-mt: 1rem;
+  --result-row-pad: 0.75rem;
 }
 
 @media (max-height: 700px), (min-width: 640px) and (max-height: 900px) {
@@ -96,6 +109,19 @@ textarea {
 
     --lobby-outer-pad: 0.75rem;
     --lobby-list-mt: 0.75rem;
+
+    --game-outer-pad: 0.75rem;
+    --game-header-mb: 0.5rem;
+    --game-question-my: 0.5rem;
+    --game-question-text: 1.625rem;
+    --keypad-gap: 0.375rem;
+    --keypad-key-h: 2.375rem;
+    --keypad-confirm-h: 2.5rem;
+
+    --result-outer-pad: 0.875rem;
+    --result-podium-gap: 0.5rem;
+    --result-list-mt: 0.5rem;
+    --result-row-pad: 0.5rem;
   }
 }
 

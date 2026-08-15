@@ -112,13 +112,20 @@ export default function RoomPage() {
   }, [roomId, nickname, navigate, playerId])
 
   useEffect(() => {
-    if (room?.status === 'COUNTDOWN' && !navigatedRef.current) {
+    if (!room || navigatedRef.current) return
+    if (room.status === 'COUNTDOWN') {
       navigatedRef.current = true
       setShowBattleStart(true)
       const timer = setTimeout(() => navigate(`/game/${roomId}`), BATTLE_START_DISPLAY_MS)
       return () => clearTimeout(timer)
     }
-  }, [room?.status, roomId, navigate])
+    if (room.status === 'IN_PROGRESS') {
+      // Landed here directly (e.g. page refresh mid-game) without seeing the COUNTDOWN
+      // transition, so skip the splash and jump straight to the game screen.
+      navigatedRef.current = true
+      navigate(`/game/${roomId}`, { replace: true })
+    }
+  }, [room, roomId, navigate])
 
   function handleLeave() {
     if (roomId) sendLeave(roomId, playerId)

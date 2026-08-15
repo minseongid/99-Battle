@@ -12,6 +12,8 @@ import com.battle99.backend.room.exception.NotHostException;
 import com.battle99.backend.room.exception.RoomAlreadyStartedException;
 import com.battle99.backend.room.exception.RoomFullException;
 import com.battle99.backend.room.exception.RoomNotFoundException;
+import com.battle99.backend.game.GameEngineService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +39,11 @@ public class RoomService {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final SecureRandom random = new SecureRandom();
     private final SimpMessagingTemplate messagingTemplate;
+    private final GameEngineService gameEngineService;
 
-    public RoomService(SimpMessagingTemplate messagingTemplate) {
+    public RoomService(SimpMessagingTemplate messagingTemplate, @Lazy GameEngineService gameEngineService) {
         this.messagingTemplate = messagingTemplate;
+        this.gameEngineService = gameEngineService;
     }
 
     public RoomResponse createRoom(CreateRoomRequest request) {
@@ -137,6 +141,7 @@ public class RoomService {
         if (room == null) {
             return;
         }
+        gameEngineService.forfeit(roomId, playerId);
         synchronized (room) {
             boolean wasHost = playerId.equals(room.getHostPlayerId());
             room.getPlayers().remove(playerId);
@@ -188,6 +193,7 @@ public class RoomService {
             room.setStatus(RoomStatus.COUNTDOWN);
             broadcast(room);
             broadcastPublicRooms();
+            gameEngineService.scheduleGameStart(room);
             return toResponse(room);
         }
     }
@@ -259,6 +265,14 @@ public class RoomService {
             throw new RoomNotFoundException(roomId);
         }
         return room;
+    }
+
+    public Room getRoomEntity(String roomId) {
+        return rooms.get(roomId);
+    }
+
+    public void broadcastRoomUpdate(Room room) {
+        broadcast(room);
     }
 
     private void broadcast(Room room) {

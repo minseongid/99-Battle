@@ -63,6 +63,10 @@ export function subscribeToPublicRooms(onMessage: (body: string) => void): () =>
   return subscribe('/topic/rooms/public', onMessage)
 }
 
+export function subscribeToGame(roomId: string, onMessage: (body: string) => void): () => void {
+  return subscribe(`/topic/room/${roomId}/game`, onMessage)
+}
+
 export function sendReady(roomId: string, playerId: string, ready: boolean) {
   getClient().publish({
     destination: `/app/room/${roomId}/ready`,
@@ -88,6 +92,20 @@ export function sendStartGame(roomId: string, playerId: string) {
   getClient().publish({
     destination: `/app/room/${roomId}/start`,
     body: JSON.stringify({ playerId }),
+  })
+}
+
+export function sendAnswer(roomId: string, playerId: string, answer: string) {
+  getClient().publish({
+    destination: `/app/room/${roomId}/answer`,
+    body: JSON.stringify({ playerId, answer }),
+  })
+}
+
+export function sendRematch(roomId: string, playerId: string, wantRematch: boolean) {
+  getClient().publish({
+    destination: `/app/room/${roomId}/rematch`,
+    body: JSON.stringify({ playerId, wantRematch }),
   })
 }
 
