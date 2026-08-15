@@ -4,6 +4,7 @@ import { Triangle, TrendingUp, Dices, ChevronsUp, Radical, Divide, Equal, Hash, 
 import { apiGet } from '../lib/api'
 import { getPlayerId } from '../lib/session'
 import { subscribeToGame, sendAnswer, registerPresence } from '../lib/ws'
+import { playBattleMusic, stopBattleMusic } from '../lib/audio'
 import { getPlayerColor, getPlayerTextColor } from '../lib/playerColors'
 import PageShell from '../components/PageShell'
 import CustomKeypad from '../components/CustomKeypad'
@@ -34,6 +35,11 @@ export default function GamePage() {
   const [submitted, setSubmitted] = useState(false)
   const [now, setNow] = useState(Date.now())
   const questionKeyRef = useRef<string>('')
+
+  useEffect(() => {
+    playBattleMusic()
+    return () => stopBattleMusic()
+  }, [])
 
   useEffect(() => {
     if (!roomId) return

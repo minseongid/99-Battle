@@ -67,7 +67,6 @@ export default function RoomPage() {
   const [showSoloConfirm, setShowSoloConfirm] = useState(false)
   const [showBattleStart, setShowBattleStart] = useState(false)
   const toastIdRef = useRef(0)
-  const navigatedRef = useRef(false)
   const sendTimestampsRef = useRef<number[]>([])
 
   useEffect(() => {
@@ -112,20 +111,28 @@ export default function RoomPage() {
   }, [roomId, nickname, navigate, playerId])
 
   useEffect(() => {
-    if (!room || navigatedRef.current) return
+    if (!room?.status) return
     if (room.status === 'COUNTDOWN') {
-      navigatedRef.current = true
       setShowBattleStart(true)
-      const timer = setTimeout(() => navigate(`/game/${roomId}`), BATTLE_START_DISPLAY_MS)
+      const timer = setTimeout(() => navigate(`/game/${roomId}`, { replace: true }), BATTLE_START_DISPLAY_MS)
       return () => clearTimeout(timer)
     }
     if (room.status === 'IN_PROGRESS') {
-      // Landed here directly (e.g. page refresh mid-game) without seeing the COUNTDOWN
-      // transition, so skip the splash and jump straight to the game screen.
-      navigatedRef.current = true
+      // Covers two cases: (a) landed here directly, e.g. a page refresh mid-game,
+      // with no COUNTDOWN transition to react to, and (b) the backend's own
+      // COUNTDOWN -> IN_PROGRESS flip (timed to land ~2s after COUNTDOWN, the same
+      // delay as the splash timer above) arrives before that local timer fires —
+      // its cleanup cancels the pending timer, so this branch must independently
+      // navigate rather than relying on a "some effect run already handled it" flag,
+      // which would otherwise block IN_PROGRESS from ever firing once COUNTDOWN's
+      // branch had already run once.
       navigate(`/game/${roomId}`, { replace: true })
     }
-  }, [room, roomId, navigate])
+    // Depend only on the status value, not the whole `room` object — a new room
+    // broadcast with the SAME status must not re-run this effect and cancel the
+    // pending splash timer for no reason.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room?.status, roomId, navigate])
 
   function handleLeave() {
     if (roomId) sendLeave(roomId, playerId)

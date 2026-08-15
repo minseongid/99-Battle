@@ -4,9 +4,11 @@ import { RotateCcw, LogOut } from 'lucide-react'
 import { apiGet } from '../lib/api'
 import { getPlayerId } from '../lib/session'
 import { subscribeToGame, subscribeToRoom, sendRematch, sendLeave, registerPresence } from '../lib/ws'
+import { playLobbyMusic } from '../lib/audio'
 import { getPlayerColor, getPlayerTextColor } from '../lib/playerColors'
 import PageShell from '../components/PageShell'
 import penguinIcon from '../assets/penguin-icon.png'
+import penguinRanking from '../assets/penguin-ranking.png'
 import type { GameMessage, PlayerRankingDto } from '../types/game'
 import type { RoomResponse } from '../types/room'
 
@@ -23,6 +25,10 @@ export default function ResultPage() {
   const [voted, setVoted] = useState(false)
   const navigatedRef = useRef(false)
   const votedRef = useRef(false)
+
+  useEffect(() => {
+    playLobbyMusic()
+  }, [])
 
   useEffect(() => {
     if (!roomId) return
@@ -92,7 +98,15 @@ export default function ResultPage() {
     <PageShell>
       <div className="flex w-full flex-1 flex-col px-6 pt-[var(--result-outer-pad)] pb-[var(--result-outer-pad)]">
         <header className="shrink-0 text-center">
-          <h2 className="text-xl font-extrabold text-[var(--color-ink)]">게임 종료!</h2>
+          <div className="mx-auto w-full overflow-hidden rounded-[var(--radius-card)]" style={{ height: 'var(--result-hero-h)' }}>
+            <img
+              src={penguinRanking}
+              alt=""
+              className="h-full w-full object-cover"
+              style={{ objectPosition: 'center 45%' }}
+            />
+          </div>
+          <h2 className="mt-1.5 text-xl font-extrabold text-[var(--color-ink)]">게임 종료!</h2>
           <p className="mt-0.5 text-sm text-[var(--color-muted)]">최종 순위를 확인해보세요</p>
         </header>
 
