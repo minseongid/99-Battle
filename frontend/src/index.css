@@ -50,9 +50,14 @@ textarea {
 }
 
 /*
-  Room 대기방 화면 전용 공간 토큰.
-  기본값은 여유 있는 폰(높이 700px+)용이고, 아이폰 SE 같은 짧은 화면에서만
-  자동으로 압축값으로 전환되어 스크롤 없이 한 화면에 들어가게 한다.
+  화면별 반응형 공간 토큰. 기본값은 여유 있는 화면(높이 700px+)용이고,
+  아이폰 SE 같은 짧은 화면에서만 자동으로 압축값으로 전환되어
+  스크롤 없이 한 화면에 들어가게 한다.
+
+  데스크탑(폭 640px 이상)에서는 PageShell 카드가 "창 높이 - 4rem(64px)"로
+  높이가 제한되므로, 압축 전환 기준을 그만큼(700px + 64px = 764px) 올려서
+  써야 실제 카드 안에서도 700px짜리 여유 공간이 보장된다.
+  두 조건을 media query list(콤마 = OR)로 묶어 하나의 규칙으로 처리한다.
 */
 :root {
   --room-avatar: 3.5rem;
@@ -73,7 +78,7 @@ textarea {
   --lobby-list-mt: 1.25rem;
 }
 
-@media (max-height: 700px) {
+@media (max-height: 700px), (min-width: 640px) and (max-height: 900px) {
   :root {
     --room-avatar: 2.75rem;
     --room-pad: 0.5rem;

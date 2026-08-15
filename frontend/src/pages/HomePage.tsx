@@ -99,7 +99,7 @@ export default function HomePage() {
           <img
             src={penguinLanding}
             alt="99 Battle 마스코트"
-            className="w-full max-w-[var(--home-mascot-size)] sm:max-w-[320px]"
+            className="w-full max-w-[var(--home-mascot-size)]"
           />
         </div>
 
