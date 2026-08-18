@@ -66,6 +66,13 @@ textarea {
   높이가 제한되므로, 압축 전환 기준을 그만큼 올려서(약 820px + 64px ≈ 900px)
   써야 실제 카드 안에서도 820px짜리 여유 공간이 보장된다.
   두 조건을 media query list(콤마 = OR)로 묶어 하나의 규칙으로 처리한다.
+
+  주의: 크롬 개발자도구 뷰포트 에뮬레이션은 지정한 픽셀을 순수 콘텐츠
+  영역으로 취급하지만, 실제 모바일 브라우저(특히 사파리)는 주소창/툴바가
+  그 안에서 추가로 공간을 차지한다. dvh가 이를 보정해주긴 해도 "실제
+  사용 가능한 높이"는 에뮬레이터로 잰 값보다 작을 수 있으므로, 압축모드
+  값(특히 콘텐츠가 가장 빽빽한 Home)은 에뮬레이터 테스트가 0 오버플로를
+  보여준 지점에서 한 번 더 여유를 두고 잡는다.
 */
 :root {
   --room-avatar: 3.5rem;
@@ -111,10 +118,10 @@ textarea {
     --room-btn-lg: 0.5rem;
     --room-chip-pad: 0.5rem;
 
-    --home-pt: 2rem;
-    --home-mascot-my: 0.75rem;
-    --home-mascot-size: 185px;
-    --home-footer-mt: 1rem;
+    --home-pt: 1.5rem;
+    --home-mascot-my: 0.5rem;
+    --home-mascot-size: 150px;
+    --home-footer-mt: 0.75rem;
 
     --lobby-outer-pad: 0.75rem;
     --lobby-list-mt: 0.75rem;

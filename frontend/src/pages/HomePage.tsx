@@ -66,28 +66,36 @@ export default function HomePage() {
     setEntered(true)
   }
 
+  if (!entered) {
+    // Rendered as the only content in this state (not layered on top of the main
+    // content via an absolute overlay) so the page's natural height is just the
+    // gate's own short content — the full home layout below never enters the DOM
+    // to inflate the page's scrollable height while the gate is showing.
+    return (
+      <PageShell>
+        <div className="flex w-full flex-1 flex-col items-center justify-center gap-4 px-6 py-6">
+          <img
+            src={gamestart}
+            alt=""
+            className="w-[78%] max-w-[320px] animate-[battle-pop_0.5s_ease-out]"
+          />
+          <button
+            type="button"
+            onClick={handleEnter}
+            className="flex items-center gap-2 rounded-[var(--radius-card)] bg-[var(--color-primary)] px-8 py-4 text-base font-bold text-white shadow-[0_8px_20px_-8px_var(--color-primary)] transition active:scale-[0.98]"
+          >
+            <Play size={20} fill="currentColor" />
+            게임 시작
+          </button>
+          <p className="text-sm font-semibold text-[var(--color-muted)]">탭해서 시작해요!</p>
+        </div>
+      </PageShell>
+    )
+  }
+
   return (
     <PageShell>
-      <div className="relative flex w-full flex-1 flex-col px-6 pt-[var(--home-pt)] pb-6">
-        {!entered && (
-          <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-[var(--color-bg)]">
-            <img
-              src={gamestart}
-              alt=""
-              className="w-[78%] max-w-[320px] animate-[battle-pop_0.5s_ease-out]"
-            />
-            <button
-              type="button"
-              onClick={handleEnter}
-              className="flex items-center gap-2 rounded-[var(--radius-card)] bg-[var(--color-primary)] px-8 py-4 text-base font-bold text-white shadow-[0_8px_20px_-8px_var(--color-primary)] transition active:scale-[0.98]"
-            >
-              <Play size={20} fill="currentColor" />
-              게임 시작
-            </button>
-            <p className="text-sm font-semibold text-[var(--color-muted)]">탭해서 시작해요!</p>
-          </div>
-        )}
-
+      <div className="flex w-full flex-1 flex-col px-6 pt-[var(--home-pt)] pb-6">
         <header className="text-center">
           <img src={brandLogo} alt="99 Battle" className="mx-auto w-[92%] max-w-[380px]" />
           <p className="mt-1 text-base font-semibold text-[var(--color-muted)]">
