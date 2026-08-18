@@ -101,7 +101,8 @@ textarea {
 
   --result-outer-pad: 1.5rem;
   --result-row-pad: 0.75rem;
-  --result-hero-h: 210px;
+  --result-hero-h: 200px;
+  --result-hero-max-h: 270px;
   --result-praise-mt: 0.75rem;
   --result-list-max-h: 320px;
 }
@@ -134,7 +135,8 @@ textarea {
 
     --result-outer-pad: 0.875rem;
     --result-row-pad: 0.5rem;
-    --result-hero-h: 130px;
+    --result-hero-h: 120px;
+    --result-hero-max-h: 160px;
     --result-praise-mt: 0.5rem;
     --result-list-max-h: 220px;
   }

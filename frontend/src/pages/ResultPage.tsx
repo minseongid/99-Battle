@@ -14,11 +14,33 @@ import type { RoomResponse } from '../types/room'
 
 const AUTO_REMATCH_SECONDS = 10
 
-const MEDALS = ['🥇', '🥈', '🥉']
 const TIER_BG: Record<number, string> = {
   1: 'bg-[#FFF6DD]',
   2: 'bg-[#F4F5F7]',
   3: 'bg-[#FBEEE3]',
+}
+// Gradient stops for a clean coin-style medal (no ribbon) — highlight, base, shade.
+const MEDAL_COLORS: Record<number, [string, string, string]> = {
+  1: ['#FFEBA6', '#FFD34E', '#F5A623'],
+  2: ['#F2F4F6', '#E3E7ED', '#B0B8C4'],
+  3: ['#F4CBA3', '#E8A768', '#C97A3E'],
+}
+
+function Medal({ rank, size }: { rank: number; size: number }) {
+  const [hi, base, shade] = MEDAL_COLORS[rank]
+  return (
+    <span
+      className="flex shrink-0 items-center justify-center rounded-full font-extrabold text-white shadow-sm"
+      style={{
+        width: size,
+        height: size,
+        fontSize: size * 0.5,
+        background: `radial-gradient(circle at 35% 30%, ${hi}, ${base} 55%, ${shade} 100%)`,
+      }}
+    >
+      {rank}
+    </span>
+  )
 }
 
 const CONFETTI: Array<{ top: string; left: string; rotate: number; color: string; size: number }> = [
@@ -130,12 +152,17 @@ export default function ResultPage() {
   return (
     <PageShell>
       <div className="flex w-full flex-1 flex-col px-6 pt-[var(--result-outer-pad)] pb-[var(--result-outer-pad)]">
-        {/* Grows to fill whatever's left over (desktop's tall card was leaving a big
-            dead gap here when this space just sat empty behind a centered list below)
-            with a sensible floor via min-height so it doesn't collapse on mobile. */}
+        {/* Grows to fill whatever's left over, floored by min-height so it doesn't
+            collapse on mobile — but ALSO capped by max-height. Without that cap, a
+            very tall screen would grow this box far past what a 300px-wide image
+            can fill at its own aspect ratio; object-contain then has to satisfy an
+            oversized height AND a capped width at once, and shrinks to whichever is
+            smaller, leaving a dead gap around the (still small) image. Capping the
+            box near the image's own proportions means there's no excess to leave
+            empty in the first place. */}
         <div
           className="relative mx-auto flex min-h-0 w-full flex-1 items-center justify-center"
-          style={{ minHeight: 'var(--result-hero-h)' }}
+          style={{ minHeight: 'var(--result-hero-h)', maxHeight: 'var(--result-hero-max-h)' }}
         >
           {CONFETTI.map((c, i) => (
             <span
@@ -151,7 +178,7 @@ export default function ResultPage() {
               }}
             />
           ))}
-          <img src={rankingImage} alt="" className="relative z-10 h-full max-w-[300px] object-contain" />
+          <img src={rankingImage} alt="" className="relative z-10 h-full max-w-full object-contain" />
         </div>
 
         {!ranking ? (
@@ -176,29 +203,33 @@ export default function ResultPage() {
                     }`}
                   >
                     {isTop3 ? (
-                      <span className="flex w-7 shrink-0 items-center justify-center text-lg leading-none">
-                        {MEDALS[r.rank - 1]}
-                      </span>
+                      <Medal rank={r.rank} size={34} />
                     ) : (
-                      <span className="flex w-7 shrink-0 items-center justify-center text-sm font-bold text-[var(--color-muted)]">
+                      <span className="flex w-[34px] shrink-0 items-center justify-center text-base font-bold text-[var(--color-muted)]">
                         {r.rank}
                       </span>
                     )}
                     <div
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                      className={`flex shrink-0 items-center justify-center rounded-full ${
+                        isTop3 ? 'h-11 w-11' : 'h-9 w-9'
+                      }`}
                       style={{ backgroundColor: getPlayerColor(r.colorIndex) }}
                     >
                       <img src={penguinIcon} alt="" className="h-full w-full object-contain" />
                     </div>
                     <span
-                      className="min-w-0 flex-1 truncate text-sm font-bold"
+                      className={`min-w-0 flex-1 truncate font-bold ${isTop3 ? 'text-base' : 'text-sm'}`}
                       style={{ color: getPlayerTextColor(r.colorIndex) }}
                     >
                       {r.nickname}
                       {isMe && <span className="ml-1 text-[var(--color-muted)]">(나)</span>}
                       {r.forfeited && <span className="ml-1 text-xs text-[var(--color-muted)]">(기권)</span>}
                     </span>
-                    <span className="shrink-0 text-base font-extrabold text-[var(--color-primary)]">
+                    <span
+                      className={`shrink-0 font-extrabold text-[var(--color-primary)] ${
+                        isTop3 ? 'text-lg' : 'text-base'
+                      }`}
+                    >
                       {r.totalScore}점
                     </span>
                   </div>

@@ -3,7 +3,12 @@ const LOBBY_MUSIC_SRC = '/bgm/puffle-parade.mp3'
 // Picked at random each time a game starts, and looped for that game's
 // duration. Add more tracks here as they're made — no other code needs to
 // change.
-const BATTLE_MUSIC_SRCS = ['/bgm/puffle-countdown-clash.mp3', '/bgm/puffle-victory-fanfare.mp3']
+const BATTLE_MUSIC_SRCS = [
+  '/bgm/puffle-countdown-clash.mp3',
+  '/bgm/puffle-victory-fanfare.mp3',
+  '/bgm/puffle-quickstep.mp3',
+  '/bgm/puffle-showdown.mp3',
+]
 
 const VOLUME = 0.35
 
