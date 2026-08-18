@@ -26,12 +26,18 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class GameEngineService {
 
+    // TEMP TESTING FLAG — revert to false before resuming real gameplay-screen work.
+    // Shrinks every stage/event down to 2 short questions so a full match takes
+    // ~20-30s instead of minutes, for fast repeated testing of the result screen,
+    // rematch flow, etc. Does not change scoring or any other rule.
+    private static final boolean FAST_TEST_MODE = true;
+
     private static final long COUNTDOWN_MS = 2000;
     private static final long EVENT_INTRO_MS = 1000;
     private static final long RESULT_DISPLAY_MS = 500;
-    private static final int STAGE_QUESTIONS = 5;
-    private static final int EVENT_QUESTIONS = 5;
-    private static final int EVENT_TIME_LIMIT_SECONDS = 5;
+    private static final int STAGE_QUESTIONS = FAST_TEST_MODE ? 2 : 5;
+    private static final int EVENT_QUESTIONS = FAST_TEST_MODE ? 2 : 5;
+    private static final int EVENT_TIME_LIMIT_SECONDS = FAST_TEST_MODE ? 2 : 5;
     private static final int WRONG_ANSWER_PENALTY = -30;
 
     private static final Map<MathCategory, String> CATEGORY_LABEL = Map.of(
@@ -123,6 +129,7 @@ public class GameEngineService {
     }
 
     private int stageTimeLimitSeconds(int stageNum) {
+        if (FAST_TEST_MODE) return 2;
         if (stageNum == 1) return 5;
         if (stageNum == 2) return 3;
         if (stageNum == 3) return 5;
@@ -312,12 +319,20 @@ public class GameEngineService {
         }
 
         if (shouldRestart) {
+            // Rematch sends everyone back to the room to ready up again — it does not
+            // auto-start a new game. The host still has to click Start once everyone
+            // (else) is ready again, same as any other game start.
             synchronized (room) {
                 if (room.getStatus() != RoomStatus.IN_PROGRESS) return;
-                room.setStatus(RoomStatus.COUNTDOWN);
+                room.setStatus(RoomStatus.WAITING);
+                for (Player p : room.getPlayers().values()) {
+                    if (!p.getPlayerId().equals(room.getHostPlayerId())) {
+                        p.setReady(false);
+                    }
+                }
             }
+            sessions.remove(roomId);
             roomService.broadcastRoomUpdate(room);
-            scheduleGameStart(room);
         }
     }
 
