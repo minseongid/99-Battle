@@ -13,6 +13,7 @@ import type { GameMessage, PlayerRankingDto } from '../types/game'
 import type { RoomResponse } from '../types/room'
 
 const AUTO_REMATCH_SECONDS = 10
+const MAX_SLOTS = 6
 
 const TIER_BG: Record<number, string> = {
   1: 'bg-[#FFF6DD]',
@@ -191,7 +192,22 @@ export default function ResultPage() {
               className="min-h-0 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm"
               style={{ maxHeight: 'var(--result-list-max-h)' }}
             >
-              {ranking.map((r) => {
+              {Array.from({ length: MAX_SLOTS }, (_, i) => {
+                const r = ranking[i]
+                if (!r) {
+                  // Reserved empty slot — keeps the card the same shape regardless of
+                  // how many players actually joined (1-6), by explicit request.
+                  return (
+                    <div key={`empty-${i}`} className="flex items-center gap-2.5 px-3 py-[var(--result-row-pad)] opacity-40">
+                      <span className="flex w-[34px] shrink-0 items-center justify-center text-base font-bold text-[var(--color-muted)]">
+                        {i + 1}
+                      </span>
+                      <div className="h-9 w-9 shrink-0 rounded-full border-2 border-dashed border-[var(--color-border)]" />
+                      <span className="min-w-0 flex-1 text-sm text-[var(--color-muted)]">-</span>
+                      <span className="shrink-0 text-base text-[var(--color-muted)]">-</span>
+                    </div>
+                  )
+                }
                 const isMe = r.playerId === playerId
                 const isTop3 = r.rank <= 3
                 const rowTint = isMe ? 'bg-[#eef4ff]' : isTop3 ? TIER_BG[r.rank] : ''
