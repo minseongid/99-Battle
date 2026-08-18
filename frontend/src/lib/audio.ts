@@ -1,5 +1,10 @@
 const LOBBY_MUSIC_SRC = '/bgm/puffle-parade.mp3'
-const BATTLE_MUSIC_SRC = '/bgm/puffle-countdown-clash.mp3'
+
+// Picked at random each time a game starts, and looped for that game's
+// duration. Add more tracks here as they're made — no other code needs to
+// change.
+const BATTLE_MUSIC_SRCS = ['/bgm/puffle-countdown-clash.mp3', '/bgm/puffle-victory-fanfare.mp3']
+
 const VOLUME = 0.35
 
 let lobbyAudioEl: HTMLAudioElement | null = null
@@ -13,15 +18,6 @@ function getLobbyAudio(): HTMLAudioElement {
     lobbyAudioEl.volume = VOLUME
   }
   return lobbyAudioEl
-}
-
-function getBattleAudio(): HTMLAudioElement {
-  if (!battleAudioEl) {
-    battleAudioEl = new Audio(BATTLE_MUSIC_SRC)
-    battleAudioEl.loop = true
-    battleAudioEl.volume = VOLUME
-  }
-  return battleAudioEl
 }
 
 export function hasStartedLobbyMusic(): boolean {
@@ -43,11 +39,17 @@ export function stopLobbyMusic() {
   }
 }
 
+/** Picks a random track from BATTLE_MUSIC_SRCS and loops it for this game. */
 export function playBattleMusic() {
   stopLobbyMusic()
-  const audio = getBattleAudio()
-  audio.currentTime = 0
-  audio.play().catch(() => {})
+  if (battleAudioEl) {
+    battleAudioEl.pause()
+  }
+  const src = BATTLE_MUSIC_SRCS[Math.floor(Math.random() * BATTLE_MUSIC_SRCS.length)]
+  battleAudioEl = new Audio(src)
+  battleAudioEl.loop = true
+  battleAudioEl.volume = VOLUME
+  battleAudioEl.play().catch(() => {})
 }
 
 export function stopBattleMusic() {

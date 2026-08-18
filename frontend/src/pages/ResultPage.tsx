@@ -4,7 +4,7 @@ import { RotateCcw, Home, Crown } from 'lucide-react'
 import { apiGet } from '../lib/api'
 import { getPlayerId } from '../lib/session'
 import { subscribeToGame, subscribeToRoom, sendRematch, sendLeave, registerPresence } from '../lib/ws'
-import { playLobbyMusic } from '../lib/audio'
+import { playLobbyMusic, stopBattleMusic } from '../lib/audio'
 import { getPlayerColor, getPlayerTextColor } from '../lib/playerColors'
 import PageShell from '../components/PageShell'
 import penguinIcon from '../assets/penguin-icon.png'
@@ -50,7 +50,11 @@ export default function ResultPage() {
   const votedRef = useRef(false)
 
   useEffect(() => {
-    playLobbyMusic()
+    // Result screen is deliberately silent — battle music already stopped when
+    // GamePage unmounted, this just covers any edge case where it didn't. Lobby
+    // music resumes only once the player actually acts (rematch, leave, or the
+    // auto-timeout standing in for a rematch click), not just from being here.
+    stopBattleMusic()
   }, [])
 
   useEffect(() => {
@@ -91,6 +95,7 @@ export default function ResultPage() {
     if (countdown <= 0) {
       votedRef.current = true
       setVoted(true)
+      playLobbyMusic()
       sendRematch(roomId, playerId, true)
       return
     }
@@ -102,12 +107,14 @@ export default function ResultPage() {
     if (!roomId || votedRef.current) return
     votedRef.current = true
     setVoted(true)
+    playLobbyMusic()
     sendRematch(roomId, playerId, true)
   }
 
   function handleLeave() {
     if (!roomId) return
     votedRef.current = true
+    playLobbyMusic()
     sendLeave(roomId, playerId)
     navigate('/lobby?mode=public')
   }
@@ -125,34 +132,42 @@ export default function ResultPage() {
       <div className="flex w-full flex-1 flex-col px-6 pt-[var(--result-outer-pad)] pb-[var(--result-outer-pad)]">
         <header className="shrink-0 text-center">
           <h2 className="text-xl font-extrabold text-[var(--color-ink)]">🏆 게임 종료!</h2>
-          <p className="mt-0.5 text-sm text-[var(--color-muted)]">모두 수고했어요!</p>
-
-          <div className="relative mx-auto flex items-center justify-center" style={{ height: 'var(--result-hero-h)' }}>
-            {CONFETTI.map((c, i) => (
-              <span
-                key={i}
-                className="absolute rounded-[1px]"
-                style={{
-                  top: c.top,
-                  left: c.left,
-                  width: c.size,
-                  height: c.size * 1.6,
-                  backgroundColor: c.color,
-                  transform: `rotate(${c.rotate}deg)`,
-                }}
-              />
-            ))}
-            <img src={rankingImage} alt="" className="relative z-10 h-full w-auto object-contain" />
-          </div>
         </header>
 
+        {/* Grows to fill whatever's left over (desktop's tall card was leaving a big
+            dead gap here when this space just sat empty behind a centered list below)
+            with a sensible floor via min-height so it doesn't collapse on mobile. */}
+        <div
+          className="relative mx-auto flex min-h-0 w-full flex-1 items-center justify-center"
+          style={{ minHeight: 'var(--result-hero-h)' }}
+        >
+          {CONFETTI.map((c, i) => (
+            <span
+              key={i}
+              className="absolute rounded-[1px]"
+              style={{
+                top: c.top,
+                left: c.left,
+                width: c.size,
+                height: c.size * 1.6,
+                backgroundColor: c.color,
+                transform: `rotate(${c.rotate}deg)`,
+              }}
+            />
+          ))}
+          <img src={rankingImage} alt="" className="relative z-10 h-full max-w-[260px] object-contain" />
+        </div>
+
         {!ranking ? (
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex shrink-0 items-center justify-center py-6">
             <p className="text-[var(--color-muted)]">불러오는 중...</p>
           </div>
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col justify-center gap-[var(--result-praise-mt)]">
-            <div className="min-h-0 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm">
+          <div className="flex shrink-0 flex-col gap-[var(--result-praise-mt)]">
+            <div
+              className="min-h-0 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm"
+              style={{ maxHeight: 'var(--result-list-max-h)' }}
+            >
               {ranking.map((r) => {
                 const isMe = r.playerId === playerId
                 const badge = RANK_BADGE[r.rank] ?? DEFAULT_BADGE
