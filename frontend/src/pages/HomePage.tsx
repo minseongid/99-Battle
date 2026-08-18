@@ -95,23 +95,32 @@ export default function HomePage() {
 
   return (
     <PageShell>
-      <div className="flex w-full flex-1 flex-col px-6 pt-[var(--home-pt)] pb-6">
-        <header className="text-center">
+      {/* h-dvh (not just PageShell's min-h-dvh) gives this a real ceiling on mobile,
+          where nothing else bounds height — without it, flex-1 on the mascot below
+          has nothing to shrink against and just renders at its natural size instead
+          of adapting to whatever room is actually left over. */}
+      <div className="flex h-dvh w-full flex-col px-6 pt-[var(--home-pt)] pb-6 sm:h-[calc(100vh-4rem)]">
+        <header className="shrink-0 text-center">
           <img src={brandLogo} alt="99 Battle" className="mx-auto w-[92%] max-w-[380px]" />
           <p className="mt-1 text-base font-semibold text-[var(--color-muted)]">
             수학 연산 배틀로 두뇌력 업그레이드!
           </p>
         </header>
 
-        <div className="my-[var(--home-mascot-my)] flex justify-center">
+        {/* flex-1 + min-h-0 makes this take exactly whatever space is left over after
+            the fixed-size header/input/buttons/footer below, and the image shrinks to
+            fit it via object-contain — so the mascot is only ever as large as the
+            screen actually allows, instead of a fixed per-breakpoint guess that either
+            overflows on a shorter real device or looks tiny on a taller one. */}
+        <div className="my-2 flex min-h-0 flex-1 items-center justify-center">
           <img
             src={penguinLanding}
             alt="99 Battle 마스코트"
-            className="w-full max-w-[var(--home-mascot-size)]"
+            className="max-h-full max-w-[var(--home-mascot-size)] object-contain"
           />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="shrink-0 flex flex-col gap-2">
           <div className="flex min-h-[18px] items-center">
             {error && <p className="text-xs font-medium text-[var(--color-error)]">{error}</p>}
           </div>
@@ -138,7 +147,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-3">
+        <div className="mt-6 flex shrink-0 flex-col gap-3">
           <button
             type="button"
             onClick={handleQuickJoin}
@@ -159,7 +168,7 @@ export default function HomePage() {
           </button>
         </div>
 
-        <p className="mt-[var(--home-footer-mt)] flex items-center justify-center gap-1.5 text-center text-xs text-[var(--color-muted)]">
+        <p className="mt-[var(--home-footer-mt)] flex shrink-0 items-center justify-center gap-1.5 text-center text-xs text-[var(--color-muted)]">
           <ShieldCheck size={14} />
           욕설 및 부정행위는 제재될 수 있습니다.
         </p>
