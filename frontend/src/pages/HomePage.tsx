@@ -95,32 +95,25 @@ export default function HomePage() {
 
   return (
     <PageShell>
-      {/* h-svh (not dvh) gives this a real ceiling on mobile, where nothing else
-          bounds height — without it, flex-1 on the mascot below has nothing to
-          shrink against and just renders at its natural size instead of adapting
-          to whatever room is actually left over. svh specifically (the SMALL
-          viewport, chrome always accounted for) rather than dvh: this page never
-          scrolls, so Safari's toolbar never auto-collapses — dvh was leaving a
-          gap at the bottom by sizing against the larger toolbar-hidden reference
-          it never actually reaches here. */}
-      <div className="flex h-svh w-full flex-col px-6 pt-[var(--home-pt)] pb-6 sm:h-[calc(100vh-4rem)]">
-        <header className="shrink-0 text-center">
+      {/* Deliberate no-scroll-policy exception: the mascot is sized for brand feel
+          first here, matching its desktop proportions, even if that means this one
+          screen scrolls on a short phone — everywhere else in the app still holds
+          to zero-scroll. Natural/auto height (no forced h-svh) so desktop sizes to
+          its actual content like every other page, instead of always stretching to
+          fill the full card height. */}
+      <div className="flex w-full flex-1 flex-col px-6 pt-[var(--home-pt)] pb-6">
+        <header className="text-center">
           <img src={brandLogo} alt="99 Battle" className="mx-auto w-[92%] max-w-[380px]" />
-          <p className="text-base font-semibold text-[var(--color-muted)]">
+          <p className="mt-1 text-base font-semibold text-[var(--color-muted)]">
             수학 연산 배틀로 두뇌력 업그레이드!
           </p>
         </header>
 
-        {/* flex-1 + min-h-0 makes this take exactly whatever space is left over after
-            the fixed-size header/input/buttons/footer below, and the image shrinks to
-            fit it via object-contain — so the mascot is only ever as large as the
-            screen actually allows, instead of a fixed per-breakpoint guess that either
-            overflows on a shorter real device or looks tiny on a taller one. */}
-        <div className="flex min-h-0 flex-1 items-center justify-center">
+        <div className="my-4 flex justify-center">
           <img
             src={penguinLanding}
             alt="99 Battle 마스코트"
-            className="max-h-full max-w-[var(--home-mascot-size)] object-contain"
+            className="w-full max-w-[var(--home-mascot-size)]"
           />
         </div>
 
