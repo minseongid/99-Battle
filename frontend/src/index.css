@@ -100,10 +100,10 @@ textarea {
   --keypad-confirm-h: 3.25rem;
 
   --result-outer-pad: 1.5rem;
-  --result-podium-gap: 0.75rem;
   --result-list-mt: 1rem;
   --result-row-pad: 0.75rem;
-  --result-hero-h: 128px;
+  --result-hero-h: 180px;
+  --result-praise-mt: 0.75rem;
 }
 
 @media (max-height: 820px), (min-width: 640px) and (max-height: 900px) {
@@ -133,10 +133,10 @@ textarea {
     --keypad-confirm-h: 2.5rem;
 
     --result-outer-pad: 0.875rem;
-    --result-podium-gap: 0.5rem;
     --result-list-mt: 0.5rem;
     --result-row-pad: 0.5rem;
-    --result-hero-h: 84px;
+    --result-hero-h: 110px;
+    --result-praise-mt: 0.5rem;
   }
 }
 

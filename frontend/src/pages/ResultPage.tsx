@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { RotateCcw, LogOut } from 'lucide-react'
+import { RotateCcw, Home, Crown } from 'lucide-react'
 import { apiGet } from '../lib/api'
 import { getPlayerId } from '../lib/session'
 import { subscribeToGame, subscribeToRoom, sendRematch, sendLeave, registerPresence } from '../lib/ws'
@@ -13,7 +13,30 @@ import type { GameMessage, PlayerRankingDto } from '../types/game'
 import type { RoomResponse } from '../types/room'
 
 const AUTO_REMATCH_SECONDS = 10
-const MEDALS = ['🥇', '🥈', '🥉']
+
+const RANK_BADGE: Record<number, { bg: string; text: string }> = {
+  1: { bg: '#FFB800', text: '#ffffff' },
+  2: { bg: '#B0B8C4', text: '#ffffff' },
+  3: { bg: '#D89660', text: '#ffffff' },
+}
+const DEFAULT_BADGE = { bg: 'var(--color-border)', text: 'var(--color-muted)' }
+
+const CONFETTI: Array<{ top: string; left: string; rotate: number; color: string; size: number }> = [
+  { top: '4%', left: '10%', rotate: -20, color: '#F5A623', size: 8 },
+  { top: '12%', left: '86%', rotate: 15, color: '#0064fe', size: 7 },
+  { top: '58%', left: '4%', rotate: 35, color: '#22c55e', size: 8 },
+  { top: '72%', left: '92%', rotate: -25, color: '#F472B6', size: 7 },
+  { top: '0%', left: '48%', rotate: 10, color: '#2f7bff', size: 6 },
+  { top: '82%', left: '18%', rotate: -10, color: '#F5A623', size: 7 },
+  { top: '8%', left: '68%', rotate: 25, color: '#22c55e', size: 6 },
+  { top: '86%', left: '72%', rotate: 15, color: '#0064fe', size: 8 },
+]
+
+function getPraise(myRank: number | undefined): { title: string; subtitle: string } {
+  if (myRank === 1) return { title: '우승했어요! 최고예요 🏆', subtitle: '압도적인 실력을 보여줬어요!' }
+  if (myRank && myRank <= 3) return { title: '메달 획득! 정말 잘했어요 🎉', subtitle: '멋진 실력을 보여줬어요!' }
+  return { title: '모두 수고했어요! 💪', subtitle: '다음엔 더 높은 순위에 도전해봐요!' }
+}
 
 export default function ResultPage() {
   const { roomId } = useParams<{ roomId: string }>()
@@ -94,14 +117,33 @@ export default function ResultPage() {
     return null
   }
 
+  const myRank = ranking?.find((r) => r.playerId === playerId)?.rank
+  const praise = getPraise(myRank)
+
   return (
     <PageShell>
       <div className="flex w-full flex-1 flex-col px-6 pt-[var(--result-outer-pad)] pb-[var(--result-outer-pad)]">
         <header className="shrink-0 text-center">
-          <div className="mx-auto flex items-center justify-center" style={{ height: 'var(--result-hero-h)' }}>
-            <img src={rankingImage} alt="" className="h-full w-auto object-contain" />
+          <h2 className="text-xl font-extrabold text-[var(--color-ink)]">🏆 게임 종료!</h2>
+          <p className="mt-0.5 text-sm text-[var(--color-muted)]">모두 수고했어요!</p>
+
+          <div className="relative mx-auto flex items-center justify-center" style={{ height: 'var(--result-hero-h)' }}>
+            {CONFETTI.map((c, i) => (
+              <span
+                key={i}
+                className="absolute rounded-[1px]"
+                style={{
+                  top: c.top,
+                  left: c.left,
+                  width: c.size,
+                  height: c.size * 1.6,
+                  backgroundColor: c.color,
+                  transform: `rotate(${c.rotate}deg)`,
+                }}
+              />
+            ))}
+            <img src={rankingImage} alt="" className="relative z-10 h-full w-auto object-contain" />
           </div>
-          <h2 className="mt-1 text-xl font-extrabold text-[var(--color-ink)]">게임 종료!</h2>
         </header>
 
         {!ranking ? (
@@ -109,38 +151,55 @@ export default function ResultPage() {
             <p className="text-[var(--color-muted)]">불러오는 중...</p>
           </div>
         ) : (
-          <div className="mt-[var(--result-list-mt)] flex flex-1 flex-col justify-center gap-1.5 overflow-y-auto">
-            {ranking.map((r) => {
-              const isMe = r.playerId === playerId
-              const medal = r.rank <= 3 ? MEDALS[r.rank - 1] : null
-              return (
-                <div
-                  key={r.playerId}
-                  className={`flex items-center gap-2.5 rounded-[var(--radius-card)] px-3 py-[var(--result-row-pad)] ${
-                    isMe ? 'bg-[#eef4ff] ring-2 ring-[var(--color-primary)]' : 'bg-[var(--color-surface)] shadow-sm'
-                  } ${r.forfeited ? 'opacity-50' : ''}`}
-                >
-                  <span className="flex w-7 shrink-0 items-center justify-center text-lg font-extrabold text-[var(--color-muted)]">
-                    {medal ?? r.rank}
-                  </span>
+          <div className="flex min-h-0 flex-1 flex-col justify-center gap-[var(--result-praise-mt)]">
+            <div className="min-h-0 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm">
+              {ranking.map((r) => {
+                const isMe = r.playerId === playerId
+                const badge = RANK_BADGE[r.rank] ?? DEFAULT_BADGE
+                return (
                   <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-                    style={{ backgroundColor: getPlayerColor(r.colorIndex) }}
+                    key={r.playerId}
+                    className={`flex items-center gap-2.5 px-3 py-[var(--result-row-pad)] ${
+                      isMe ? 'bg-[#eef4ff]' : ''
+                    } ${r.forfeited ? 'opacity-50' : ''}`}
                   >
-                    <img src={penguinIcon} alt="" className="h-full w-full object-contain" />
+                    <span
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-extrabold"
+                      style={{ backgroundColor: badge.bg, color: badge.text }}
+                    >
+                      {r.rank}
+                    </span>
+                    <div
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                      style={{ backgroundColor: getPlayerColor(r.colorIndex) }}
+                    >
+                      <img src={penguinIcon} alt="" className="h-full w-full object-contain" />
+                    </div>
+                    <span
+                      className="min-w-0 flex-1 truncate text-sm font-bold"
+                      style={{ color: getPlayerTextColor(r.colorIndex) }}
+                    >
+                      {r.nickname}
+                      {isMe && <span className="ml-1 text-[var(--color-muted)]">(나)</span>}
+                      {r.forfeited && <span className="ml-1 text-xs text-[var(--color-muted)]">(기권)</span>}
+                    </span>
+                    <span className="shrink-0 text-base font-extrabold text-[var(--color-primary)]">
+                      {r.totalScore}점
+                    </span>
                   </div>
-                  <span
-                    className="min-w-0 flex-1 truncate text-sm font-bold"
-                    style={{ color: getPlayerTextColor(r.colorIndex) }}
-                  >
-                    {r.nickname}
-                    {isMe && <span className="ml-1 text-[var(--color-muted)]">(나)</span>}
-                    {r.forfeited && <span className="ml-1 text-xs text-[var(--color-muted)]">(기권)</span>}
-                  </span>
-                  <span className="shrink-0 text-base font-extrabold text-[var(--color-ink)]">{r.totalScore}</span>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
+
+            <div className="flex shrink-0 items-center gap-3 rounded-[var(--radius-card)] bg-[#eef4ff] px-4 py-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-white">
+                <Crown size={18} fill="currentColor" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-extrabold text-[var(--color-ink)]">{praise.title}</p>
+                <p className="truncate text-xs text-[var(--color-muted)]">{praise.subtitle}</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -156,8 +215,8 @@ export default function ResultPage() {
               onClick={handleLeave}
               className="flex flex-1 items-center justify-center gap-1.5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] py-3.5 text-sm font-bold text-[var(--color-ink)] transition active:scale-[0.98]"
             >
-              <LogOut size={16} />
-              방 나가기
+              <Home size={16} />
+              나가기
             </button>
             <button
               type="button"
@@ -166,7 +225,7 @@ export default function ResultPage() {
               className="flex flex-1 items-center justify-center gap-1.5 rounded-[var(--radius-card)] bg-[var(--color-primary)] py-3.5 text-sm font-bold text-white shadow-[0_8px_20px_-8px_var(--color-primary)] transition active:scale-[0.98] disabled:opacity-60"
             >
               <RotateCcw size={16} />
-              {voted ? '대기 중...' : '다시 하기'}
+              {voted ? '대기 중...' : '한번 더 하기'}
             </button>
           </div>
         </div>
