@@ -14,12 +14,12 @@ import type { RoomResponse } from '../types/room'
 
 const AUTO_REMATCH_SECONDS = 10
 
-const RANK_BADGE: Record<number, { bg: string; text: string }> = {
-  1: { bg: '#FFB800', text: '#ffffff' },
-  2: { bg: '#B0B8C4', text: '#ffffff' },
-  3: { bg: '#D89660', text: '#ffffff' },
+const MEDALS = ['🥇', '🥈', '🥉']
+const TIER_BG: Record<number, string> = {
+  1: 'bg-[#FFF6DD]',
+  2: 'bg-[#F4F5F7]',
+  3: 'bg-[#FBEEE3]',
 }
-const DEFAULT_BADGE = { bg: 'var(--color-border)', text: 'var(--color-muted)' }
 
 const CONFETTI: Array<{ top: string; left: string; rotate: number; color: string; size: number }> = [
   { top: '4%', left: '10%', rotate: -20, color: '#F5A623', size: 8 },
@@ -130,10 +130,6 @@ export default function ResultPage() {
   return (
     <PageShell>
       <div className="flex w-full flex-1 flex-col px-6 pt-[var(--result-outer-pad)] pb-[var(--result-outer-pad)]">
-        <header className="shrink-0 text-center">
-          <h2 className="text-xl font-extrabold text-[var(--color-ink)]">🏆 게임 종료!</h2>
-        </header>
-
         {/* Grows to fill whatever's left over (desktop's tall card was leaving a big
             dead gap here when this space just sat empty behind a centered list below)
             with a sensible floor via min-height so it doesn't collapse on mobile. */}
@@ -155,7 +151,7 @@ export default function ResultPage() {
               }}
             />
           ))}
-          <img src={rankingImage} alt="" className="relative z-10 h-full max-w-[260px] object-contain" />
+          <img src={rankingImage} alt="" className="relative z-10 h-full max-w-[300px] object-contain" />
         </div>
 
         {!ranking ? (
@@ -170,20 +166,24 @@ export default function ResultPage() {
             >
               {ranking.map((r) => {
                 const isMe = r.playerId === playerId
-                const badge = RANK_BADGE[r.rank] ?? DEFAULT_BADGE
+                const isTop3 = r.rank <= 3
+                const rowTint = isMe ? 'bg-[#eef4ff]' : isTop3 ? TIER_BG[r.rank] : ''
                 return (
                   <div
                     key={r.playerId}
-                    className={`flex items-center gap-2.5 px-3 py-[var(--result-row-pad)] ${
-                      isMe ? 'bg-[#eef4ff]' : ''
-                    } ${r.forfeited ? 'opacity-50' : ''}`}
+                    className={`flex items-center gap-2.5 px-3 py-[var(--result-row-pad)] ${rowTint} ${
+                      r.forfeited ? 'opacity-50' : ''
+                    }`}
                   >
-                    <span
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-extrabold"
-                      style={{ backgroundColor: badge.bg, color: badge.text }}
-                    >
-                      {r.rank}
-                    </span>
+                    {isTop3 ? (
+                      <span className="flex w-7 shrink-0 items-center justify-center text-lg leading-none">
+                        {MEDALS[r.rank - 1]}
+                      </span>
+                    ) : (
+                      <span className="flex w-7 shrink-0 items-center justify-center text-sm font-bold text-[var(--color-muted)]">
+                        {r.rank}
+                      </span>
+                    )}
                     <div
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
                       style={{ backgroundColor: getPlayerColor(r.colorIndex) }}
