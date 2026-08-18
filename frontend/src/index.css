@@ -85,7 +85,7 @@ textarea {
   --room-chip-pad: 0.625rem;
 
   --home-pt: 3rem;
-  --home-mascot-size: 260px;
+  --home-mascot-size: 300px;
   --home-footer-mt: 2rem;
 
   --lobby-outer-pad: 1.5rem;
@@ -118,7 +118,7 @@ textarea {
     --room-chip-pad: 0.5rem;
 
     --home-pt: 1.5rem;
-    --home-mascot-size: 190px;
+    --home-mascot-size: 240px;
     --home-footer-mt: 0.75rem;
 
     --lobby-outer-pad: 0.75rem;

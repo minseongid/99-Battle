@@ -106,7 +106,7 @@ export default function HomePage() {
       <div className="flex h-svh w-full flex-col px-6 pt-[var(--home-pt)] pb-6 sm:h-[calc(100vh-4rem)]">
         <header className="shrink-0 text-center">
           <img src={brandLogo} alt="99 Battle" className="mx-auto w-[92%] max-w-[380px]" />
-          <p className="mt-1 text-base font-semibold text-[var(--color-muted)]">
+          <p className="text-base font-semibold text-[var(--color-muted)]">
             수학 연산 배틀로 두뇌력 업그레이드!
           </p>
         </header>
@@ -116,7 +116,7 @@ export default function HomePage() {
             fit it via object-contain — so the mascot is only ever as large as the
             screen actually allows, instead of a fixed per-breakpoint guess that either
             overflows on a shorter real device or looks tiny on a taller one. */}
-        <div className="my-2 flex min-h-0 flex-1 items-center justify-center">
+        <div className="flex min-h-0 flex-1 items-center justify-center">
           <img
             src={penguinLanding}
             alt="99 Battle 마스코트"
