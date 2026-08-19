@@ -11,6 +11,8 @@ const BATTLE_MUSIC_SRCS = [
 ]
 
 const VOLUME = 0.35
+const LOBBY_MUTE_KEY = 'battle99_lobby_muted'
+const BATTLE_MUTE_KEY = 'battle99_battle_muted'
 
 let lobbyAudioEl: HTMLAudioElement | null = null
 let battleAudioEl: HTMLAudioElement | null = null
@@ -29,10 +31,19 @@ export function hasStartedLobbyMusic(): boolean {
   return started
 }
 
+export function isLobbyMusicMuted(): boolean {
+  return localStorage.getItem(LOBBY_MUTE_KEY) === '1'
+}
+
+export function isBattleMusicMuted(): boolean {
+  return localStorage.getItem(BATTLE_MUTE_KEY) === '1'
+}
+
 export function playLobbyMusic() {
   stopBattleMusic()
-  const audio = getLobbyAudio()
   started = true
+  if (isLobbyMusicMuted()) return
+  const audio = getLobbyAudio()
   if (audio.paused) {
     audio.play().catch(() => {})
   }
@@ -50,6 +61,7 @@ export function playBattleMusic() {
   if (battleAudioEl) {
     battleAudioEl.pause()
   }
+  if (isBattleMusicMuted()) return
   const src = BATTLE_MUSIC_SRCS[Math.floor(Math.random() * BATTLE_MUSIC_SRCS.length)]
   battleAudioEl = new Audio(src)
   battleAudioEl.loop = true
@@ -60,5 +72,24 @@ export function playBattleMusic() {
 export function stopBattleMusic() {
   if (battleAudioEl && !battleAudioEl.paused) {
     battleAudioEl.pause()
+  }
+}
+
+/** Toggled from the settings popup. Applies immediately if lobby music is meant to be playing. */
+export function setLobbyMusicMuted(muted: boolean) {
+  localStorage.setItem(LOBBY_MUTE_KEY, muted ? '1' : '0')
+  if (muted) {
+    stopLobbyMusic()
+  } else if (started) {
+    playLobbyMusic()
+  }
+}
+
+/** Toggled from the settings popup. Only affects the currently-playing track, if any —
+ * the next game start will already respect the flag via playBattleMusic(). */
+export function setBattleMusicMuted(muted: boolean) {
+  localStorage.setItem(BATTLE_MUTE_KEY, muted ? '1' : '0')
+  if (muted) {
+    stopBattleMusic()
   }
 }

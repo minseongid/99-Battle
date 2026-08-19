@@ -104,7 +104,6 @@ textarea {
   --result-hero-h: 200px;
   --result-hero-max-h: 270px;
   --result-praise-mt: 0.75rem;
-  --result-list-max-h: 320px;
 }
 
 @media (max-height: 820px), (min-width: 640px) and (max-height: 900px) {
@@ -138,7 +137,6 @@ textarea {
     --result-hero-h: 120px;
     --result-hero-max-h: 160px;
     --result-praise-mt: 0.5rem;
-    --result-list-max-h: 220px;
   }
 }
 

@@ -22,24 +22,34 @@ const TIER_BG: Record<number, string> = {
 }
 // Gradient stops for a clean coin-style medal (no ribbon) — highlight, base, shade.
 const MEDAL_COLORS: Record<number, [string, string, string]> = {
-  1: ['#FFEBA6', '#FFD34E', '#F5A623'],
-  2: ['#F2F4F6', '#E3E7ED', '#B0B8C4'],
-  3: ['#F4CBA3', '#E8A768', '#C97A3E'],
+  1: ['#FFF3C4', '#FFC93C', '#E8960C'],
+  2: ['#F7F8FA', '#D4D8DE', '#9AA2AC'],
+  3: ['#F5C99A', '#D9873F', '#A85A1F'],
 }
 
+/** A coin-style medal badge: diagonal glossy gradient, a beveled inset edge, and a
+ * soft drop shadow beneath so it reads as an actual medal, not a flat colored dot. */
 function Medal({ rank, size }: { rank: number; size: number }) {
-  const [hi, base, shade] = MEDAL_COLORS[rank]
+  const [hi, base, dark] = MEDAL_COLORS[rank]
   return (
-    <span
-      className="flex shrink-0 items-center justify-center rounded-full font-extrabold text-white shadow-sm"
-      style={{
-        width: size,
-        height: size,
-        fontSize: size * 0.5,
-        background: `radial-gradient(circle at 35% 30%, ${hi}, ${base} 55%, ${shade} 100%)`,
-      }}
-    >
-      {rank}
+    <span className="relative flex shrink-0 items-center justify-center" style={{ width: size, height: size * 1.2 }}>
+      <span
+        className="absolute bottom-0 rounded-full bg-black/15 blur-[2px]"
+        style={{ width: size * 0.72, height: size * 0.16, left: '50%', transform: 'translateX(-50%)' }}
+      />
+      <span
+        className="relative flex items-center justify-center rounded-full font-extrabold text-white"
+        style={{
+          width: size,
+          height: size,
+          fontSize: size * 0.52,
+          background: `linear-gradient(135deg, ${hi} 0%, ${base} 50%, ${dark} 100%)`,
+          boxShadow: 'inset -2px -3px 5px rgba(0,0,0,0.25), inset 2px 2px 3px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.15)',
+          textShadow: '0 1px 1px rgba(0,0,0,0.25)',
+        }}
+      >
+        {rank}
+      </span>
     </span>
   )
 }
@@ -152,7 +162,12 @@ export default function ResultPage() {
 
   return (
     <PageShell>
-      <div className="flex w-full flex-1 flex-col px-6 pt-[var(--result-outer-pad)] pb-[var(--result-outer-pad)]">
+      {/* h-svh / sm:h-[calc(100vh-4rem)] gives this a real ceiling on mobile, where
+          nothing else bounds height — without it, the ranking list's flex-1 below
+          has nothing to shrink against on a short screen, so instead of scrolling
+          internally the WHOLE PAGE just grows past the viewport. Same lesson as
+          Home's mascot and Lobby's room list. */}
+      <div className="flex h-svh w-full flex-col px-6 pt-[var(--result-outer-pad)] pb-[var(--result-outer-pad)] sm:h-[calc(100vh-4rem)]">
         {/* Grows to fill whatever's left over, floored by min-height so it doesn't
             collapse on mobile — but ALSO capped by max-height. Without that cap, a
             very tall screen would grow this box far past what a 300px-wide image
@@ -187,11 +202,14 @@ export default function ResultPage() {
             <p className="text-[var(--color-muted)]">불러오는 중...</p>
           </div>
         ) : (
-          <div className="flex shrink-0 flex-col gap-[var(--result-praise-mt)]">
-            <div
-              className="min-h-0 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm"
-              style={{ maxHeight: 'var(--result-list-max-h)' }}
-            >
+          // flex-1 here (was shrink-0) so the list below claims whatever room the
+          // hero's max-height cap left on the table — on a tall/wide screen all 6
+          // rows show at full size with no scroll and the buttons land right after,
+          // instead of a gap sitting between the list and the buttons. The list's
+          // own overflow-y-auto still kicks in on a short screen where 6 rows
+          // genuinely don't fit.
+          <div className="flex min-h-0 flex-1 flex-col gap-[var(--result-praise-mt)]">
+            <div className="min-h-0 flex-1 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm">
               {Array.from({ length: MAX_SLOTS }, (_, i) => {
                 const r = ranking[i]
                 if (!r) {

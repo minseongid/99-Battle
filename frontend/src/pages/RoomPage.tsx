@@ -13,6 +13,7 @@ import {
   registerPresence,
 } from '../lib/ws'
 import { getPlayerColor, getPlayerTextColor } from '../lib/playerColors'
+import { stopLobbyMusic } from '../lib/audio'
 import PageShell from '../components/PageShell'
 import type { RoomResponse } from '../types/room'
 import penguinIcon from '../assets/penguin-icon.png'
@@ -113,6 +114,10 @@ export default function RoomPage() {
   useEffect(() => {
     if (!room?.status) return
     if (room.status === 'COUNTDOWN') {
+      // Music must cut out the instant the splash appears, not 2s later when
+      // GamePage happens to mount — waiting for that made it sound like the
+      // lobby track kept playing straight through the battle-start moment.
+      stopLobbyMusic()
       setShowBattleStart(true)
       const timer = setTimeout(() => navigate(`/game/${roomId}`, { replace: true }), BATTLE_START_DISPLAY_MS)
       return () => clearTimeout(timer)

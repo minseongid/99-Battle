@@ -5,6 +5,7 @@ import penguinLanding from '../assets/penguin-landing2.png'
 import brandLogo from '../assets/brand-logo.png'
 import gamestart from '../assets/gamestart.png'
 import PageShell from '../components/PageShell'
+import SettingsButton from '../components/SettingsButton'
 import { getNickname, setNickname } from '../lib/session'
 import { apiGet } from '../lib/api'
 import { hasStartedLobbyMusic, playLobbyMusic } from '../lib/audio'
@@ -101,7 +102,10 @@ export default function HomePage() {
           to zero-scroll. Natural/auto height (no forced h-svh) so desktop sizes to
           its actual content like every other page, instead of always stretching to
           fill the full card height. */}
-      <div className="flex w-full flex-1 flex-col px-6 pt-[var(--home-pt)] pb-6">
+      <div className="relative flex w-full flex-1 flex-col px-6 pt-[var(--home-pt)] pb-6">
+        <div className="absolute right-4 top-[var(--home-pt)]">
+          <SettingsButton />
+        </div>
         <header className="text-center">
           <img src={brandLogo} alt="99 Battle" className="mx-auto w-[92%] max-w-[380px]" />
           <p className="mt-1 text-base font-semibold text-[var(--color-muted)]">
