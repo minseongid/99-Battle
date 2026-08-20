@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { RotateCcw, Home, Crown } from 'lucide-react'
+import { RotateCcw, Home, Trophy, Medal as MedalIcon, Flame } from 'lucide-react'
 import { apiGet } from '../lib/api'
 import { getPlayerId } from '../lib/session'
 import { subscribeToGame, subscribeToRoom, sendRematch, sendLeave, registerPresence } from '../lib/ws'
@@ -34,10 +34,17 @@ const CONFETTI: Array<{ top: string; left: string; rotate: number; color: string
   { top: '86%', left: '72%', rotate: 15, color: '#0064fe', size: 8 },
 ]
 
-function getPraise(myRank: number | undefined): { title: string; subtitle: string } {
-  if (myRank === 1) return { title: '우승했어요! 최고예요 🏆', subtitle: '압도적인 실력을 보여줬어요!' }
-  if (myRank && myRank <= 3) return { title: '메달 획득! 정말 잘했어요 🎉', subtitle: '멋진 실력을 보여줬어요!' }
-  return { title: '좋은 승부였어요! 🔥', subtitle: '다음 배틀에서는 더 높은 순위를 노려봐요!' }
+function getPraise(
+  myRank: number | undefined
+): { title: string; subtitle: string; icon: typeof Trophy } {
+  if (myRank === 1) return { title: '우승했어요! 최고예요 🏆', subtitle: '압도적인 실력을 보여줬어요!', icon: Trophy }
+  if (myRank && myRank <= 3)
+    return { title: '메달 획득! 정말 잘했어요 🎉', subtitle: '멋진 실력을 보여줬어요!', icon: MedalIcon }
+  return {
+    title: '좋은 승부였어요! 🔥',
+    subtitle: '다음 배틀에서는 더 높은 순위를 노려봐요!',
+    icon: Flame,
+  }
 }
 
 export default function ResultPage() {
@@ -246,7 +253,7 @@ export default function ResultPage() {
                       </span>
                     )}
                     <span
-                      className={`min-w-0 flex-1 truncate font-bold ${isTop3 ? 'text-base' : 'text-sm'}`}
+                      className="min-w-0 flex-1 truncate text-sm font-bold"
                       style={{ color: getPlayerTextColor(r.colorIndex) }}
                     >
                       {r.nickname}
@@ -257,11 +264,7 @@ export default function ResultPage() {
                       )}
                       {r.forfeited && <span className="ml-1 text-xs text-[var(--color-muted)]">(기권)</span>}
                     </span>
-                    <span
-                      className={`shrink-0 font-extrabold text-[var(--color-primary)] ${
-                        isTop3 ? 'text-lg' : 'text-base'
-                      }`}
-                    >
+                    <span className="shrink-0 text-base font-extrabold text-[var(--color-primary)]">
                       {r.totalScore}점
                     </span>
                   </div>
@@ -272,7 +275,7 @@ export default function ResultPage() {
 
             <div className="flex shrink-0 items-center gap-3 rounded-[var(--radius-card)] bg-[#eef4ff] px-4 py-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-white">
-                <Crown size={18} fill="currentColor" />
+                <praise.icon size={18} fill="currentColor" />
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-extrabold text-[var(--color-ink)]">{praise.title}</p>
