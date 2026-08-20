@@ -17,14 +17,16 @@ import java.util.Set;
 @Controller
 public class RoomWsController {
 
+    // Must stay in sync with QUICK_MESSAGES in frontend/src/pages/RoomPage.tsx —
+    // a message that isn't an exact match here is silently dropped (see below).
     private static final Set<String> ALLOWED_QUICK_MESSAGES = Set.of(
             "반가워요~ 👋",
-            "레디 눌러줘! ⚡",
+            "준비해줘! ⚡",
             "잘 부탁해요! 😊",
             "화이팅! 🔥",
             "굿굿! 👍",
             "아깝다! 😅",
-            "한 판 더! 🔁"
+            "고고! 🚀"
     );
 
     private final RoomService roomService;

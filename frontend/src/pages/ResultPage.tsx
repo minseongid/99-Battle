@@ -186,7 +186,7 @@ export default function ResultPage() {
           {CONFETTI.map((c, i) => (
             <span
               key={i}
-              className="absolute rounded-[1px]"
+              className="absolute z-20 rounded-[1px]"
               style={{
                 top: c.top,
                 left: c.left,
@@ -235,7 +235,7 @@ export default function ResultPage() {
                 }
                 const isMe = r.playerId === playerId
                 const isTop3 = r.rank <= 3
-                const rowTint = isMe ? 'bg-[#eef4ff]' : isTop3 ? TIER_BG[r.rank] : ''
+                const rowTint = isTop3 ? TIER_BG[r.rank] : ''
                 return (
                   <div
                     key={r.playerId}
