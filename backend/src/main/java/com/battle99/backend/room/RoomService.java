@@ -97,7 +97,10 @@ public class RoomService {
 
     public List<PublicRoomSummary> listPublicRooms() {
         return rooms.values().stream()
-                .filter(room -> room.getStatus() == RoomStatus.WAITING && !room.isFull())
+                // Full rooms stay listed (shown as e.g. 2/2) instead of vanishing —
+                // joinRoom() already rejects with RoomFullException, so the list just
+                // needs to reflect reality rather than hide rooms that exist.
+                .filter(room -> room.getStatus() == RoomStatus.WAITING)
                 .map(room -> new PublicRoomSummary(
                         room.getRoomId(), room.getRoomName(),
                         room.getPlayers().size(), room.getMaxPlayers(), room.getMathEventCount()

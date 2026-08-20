@@ -162,9 +162,10 @@ export default function LobbyPage() {
               <button
                 type="button"
                 onClick={() => joinRoom(room.roomId)}
-                className="shrink-0 rounded-[var(--radius-card)] bg-[#eef4ff] px-4 py-2.5 text-sm font-bold text-[var(--color-primary)] active:scale-[0.98]"
+                disabled={room.currentPlayers >= room.maxPlayers}
+                className="shrink-0 rounded-[var(--radius-card)] bg-[#eef4ff] px-4 py-2.5 text-sm font-bold text-[var(--color-primary)] active:scale-[0.98] disabled:bg-[var(--color-bg)] disabled:text-[var(--color-muted)]"
               >
-                입장하기
+                {room.currentPlayers >= room.maxPlayers ? '가득 참' : '입장하기'}
               </button>
             </div>
           ))}
