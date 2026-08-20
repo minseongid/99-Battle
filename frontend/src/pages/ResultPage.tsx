@@ -20,39 +20,9 @@ const TIER_BG: Record<number, string> = {
   2: 'bg-[#F4F5F7]',
   3: 'bg-[#FBEEE3]',
 }
-// Gradient stops for a clean coin-style medal (no ribbon) — highlight, base, shade.
-const MEDAL_COLORS: Record<number, [string, string, string]> = {
-  1: ['#FFF3C4', '#FFC93C', '#E8960C'],
-  2: ['#F7F8FA', '#D4D8DE', '#9AA2AC'],
-  3: ['#F5C99A', '#D9873F', '#A85A1F'],
-}
-
-/** A coin-style medal badge: diagonal glossy gradient, a beveled inset edge, and a
- * soft drop shadow beneath so it reads as an actual medal, not a flat colored dot. */
-function Medal({ rank, size }: { rank: number; size: number }) {
-  const [hi, base, dark] = MEDAL_COLORS[rank]
-  return (
-    <span className="relative flex shrink-0 items-center justify-center" style={{ width: size, height: size * 1.2 }}>
-      <span
-        className="absolute bottom-0 rounded-full bg-black/15 blur-[2px]"
-        style={{ width: size * 0.72, height: size * 0.16, left: '50%', transform: 'translateX(-50%)' }}
-      />
-      <span
-        className="relative flex items-center justify-center rounded-full font-extrabold text-white"
-        style={{
-          width: size,
-          height: size,
-          fontSize: size * 0.52,
-          background: `linear-gradient(135deg, ${hi} 0%, ${base} 50%, ${dark} 100%)`,
-          boxShadow: 'inset -2px -3px 5px rgba(0,0,0,0.25), inset 2px 2px 3px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.15)',
-          textShadow: '0 1px 1px rgba(0,0,0,0.25)',
-        }}
-      >
-        {rank}
-      </span>
-    </span>
-  )
-}
+// Ribbon-medal emoji — reverted from the coin-badge redesign, per explicit user
+// decision that the emoji reads as a "real medal" and the coin badge didn't.
+const MEDALS = ['🥇', '🥈', '🥉']
 
 const CONFETTI: Array<{ top: string; left: string; rotate: number; color: string; size: number }> = [
   { top: '4%', left: '10%', rotate: -20, color: '#F5A623', size: 8 },
@@ -81,6 +51,22 @@ export default function ResultPage() {
   const [voted, setVoted] = useState(false)
   const navigatedRef = useRef(false)
   const votedRef = useRef(false)
+  const listRef = useRef<HTMLDivElement>(null)
+  const [listNaturalHeight, setListNaturalHeight] = useState<number>()
+
+  // The list's own scrollHeight is its true content height (all 6 rows) regardless
+  // of how much space the flex layout actually renders it at — capping maxHeight to
+  // that value stops it from stretching taller than 6 rows on spacious desktop
+  // screens (which left dead white space inside the card), while still letting it
+  // shrink below that via overflow-y-auto on short screens.
+  useEffect(() => {
+    function measure() {
+      if (listRef.current) setListNaturalHeight(listRef.current.scrollHeight)
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [ranking])
 
   useEffect(() => {
     // Result screen is deliberately silent — battle music already stopped when
@@ -202,14 +188,19 @@ export default function ResultPage() {
             <p className="text-[var(--color-muted)]">불러오는 중...</p>
           </div>
         ) : (
-          // flex-1 here (was shrink-0) so the list below claims whatever room the
-          // hero's max-height cap left on the table — on a tall/wide screen all 6
-          // rows show at full size with no scroll and the buttons land right after,
-          // instead of a gap sitting between the list and the buttons. The list's
-          // own overflow-y-auto still kicks in on a short screen where 6 rows
-          // genuinely don't fit.
-          <div className="flex min-h-0 flex-1 flex-col gap-[var(--result-praise-mt)]">
-            <div className="min-h-0 flex-1 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm">
+          // justify-center + the list's own measured maxHeight (see listNaturalHeight
+          // above): the list is capped to exactly what 6 rows need, so on a spacious
+          // desktop screen it no longer stretches into a card with dead white space
+          // below row 6 — any true leftover space instead becomes breathing room
+          // above the list and below the praise banner. On a short screen the list
+          // still has nothing to center around (it already fills the flex-1 area)
+          // and falls back to its own overflow-y-auto internal scroll.
+          <div className="flex min-h-0 flex-1 flex-col justify-center gap-[var(--result-praise-mt)]">
+            <div
+              className="min-h-0 flex-1 overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm"
+              style={{ maxHeight: listNaturalHeight }}
+            >
+            <div ref={listRef} className="divide-y divide-[var(--color-border)]">
               {Array.from({ length: MAX_SLOTS }, (_, i) => {
                 const r = ranking[i]
                 if (!r) {
@@ -237,7 +228,9 @@ export default function ResultPage() {
                     }`}
                   >
                     {isTop3 ? (
-                      <Medal rank={r.rank} size={34} />
+                      <span className="flex w-[34px] shrink-0 items-center justify-center text-[28px] leading-none">
+                        {MEDALS[r.rank - 1]}
+                      </span>
                     ) : (
                       <span className="flex w-[34px] shrink-0 items-center justify-center text-base font-bold text-[var(--color-muted)]">
                         {r.rank}
@@ -269,6 +262,7 @@ export default function ResultPage() {
                   </div>
                 )
               })}
+            </div>
             </div>
 
             <div className="flex shrink-0 items-center gap-3 rounded-[var(--radius-card)] bg-[#eef4ff] px-4 py-3">

@@ -6,6 +6,7 @@ import { getNickname, getPlayerId } from '../lib/session'
 import { subscribeToPublicRooms } from '../lib/ws'
 import { playLobbyMusic } from '../lib/audio'
 import PageShell from '../components/PageShell'
+import SettingsButton from '../components/SettingsButton'
 import type { PublicRoomSummary, RoomResponse } from '../types/room'
 
 export default function LobbyPage() {
@@ -118,6 +119,9 @@ export default function LobbyPage() {
             <ArrowLeft size={20} />
           </button>
           <h1 className="text-xl font-extrabold text-[var(--color-ink)]">공개방</h1>
+          <div className="ml-auto">
+            <SettingsButton />
+          </div>
         </header>
 
         {error && <p className="mt-4 shrink-0 text-sm font-medium text-[var(--color-error)]">{error}</p>}
