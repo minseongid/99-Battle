@@ -5,9 +5,8 @@ import { apiGet } from '../lib/api'
 import { getPlayerId } from '../lib/session'
 import { subscribeToGame, subscribeToRoom, sendRematch, sendLeave, registerPresence } from '../lib/ws'
 import { playLobbyMusic, stopBattleMusic } from '../lib/audio'
-import { getPlayerColor, getPlayerTextColor } from '../lib/playerColors'
+import { getPlayerTextColor } from '../lib/playerColors'
 import PageShell from '../components/PageShell'
-import penguinIcon from '../assets/penguin-icon.png'
 import rankingImage from '../assets/ranking.png'
 import type { GameMessage, PlayerRankingDto } from '../types/game'
 import type { RoomResponse } from '../types/room'
@@ -211,7 +210,6 @@ export default function ResultPage() {
                       <span className="flex w-[34px] shrink-0 items-center justify-center text-base font-bold text-[var(--color-muted)]">
                         {i + 1}
                       </span>
-                      <div className="h-9 w-9 shrink-0 rounded-full border-2 border-dashed border-[var(--color-border)]" />
                       <span className="min-w-0 flex-1 text-sm text-[var(--color-muted)]">-</span>
                       <span className="shrink-0 text-base text-[var(--color-muted)]">-</span>
                     </div>
@@ -236,14 +234,6 @@ export default function ResultPage() {
                         {r.rank}
                       </span>
                     )}
-                    <div
-                      className={`flex shrink-0 items-center justify-center rounded-full ${
-                        isTop3 ? 'h-11 w-11' : 'h-9 w-9'
-                      }`}
-                      style={{ backgroundColor: getPlayerColor(r.colorIndex) }}
-                    >
-                      <img src={penguinIcon} alt="" className="h-full w-full object-contain" />
-                    </div>
                     <span
                       className={`min-w-0 flex-1 truncate font-bold ${isTop3 ? 'text-base' : 'text-sm'}`}
                       style={{ color: getPlayerTextColor(r.colorIndex) }}
