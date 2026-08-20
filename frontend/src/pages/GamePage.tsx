@@ -143,7 +143,14 @@ export default function GamePage() {
     const mine = results.find((r) => r.playerId === playerId)
     return (
       <PageShell>
-        <div className="flex w-full flex-1 flex-col px-5 pt-[var(--game-outer-pad)] pb-[var(--game-outer-pad)]">
+        {/* Extra bottom padding covers env(safe-area-inset-bottom) so the keypad's
+            confirm button never ends up under iOS Safari's floating bottom bar on a
+            real notched iPhone — invisible in desktop devtools emulation, which
+            doesn't simulate the inset. */}
+        <div
+          className="flex w-full flex-1 flex-col px-5 pt-[var(--game-outer-pad)]"
+          style={{ paddingBottom: 'calc(var(--game-outer-pad) + env(safe-area-inset-bottom))' }}
+        >
           <div className="flex flex-col items-center gap-1 text-center">
             <p className="text-xs font-semibold text-[var(--color-muted)]">{message.questionText}</p>
             <p className="text-sm text-[var(--color-muted)]">

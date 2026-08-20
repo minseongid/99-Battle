@@ -151,8 +151,19 @@ export default function ResultPage() {
           nothing else bounds height — without it, the ranking list's flex-1 below
           has nothing to shrink against on a short screen, so instead of scrolling
           internally the WHOLE PAGE just grows past the viewport. Same lesson as
-          Home's mascot and Lobby's room list. */}
-      <div className="flex h-svh w-full flex-col px-6 pt-[var(--result-outer-pad)] pb-[var(--result-outer-pad)] sm:h-[calc(100vh-4rem)]">
+          Home's mascot and Lobby's room list.
+
+          The bottom padding adds env(safe-area-inset-bottom) on top of the usual
+          spacing — iOS Safari's floating bottom bar (and the home-indicator gesture
+          area under it) sits in that safe-area strip regardless of svh, so without
+          this the rematch/leave buttons render right at the edge of it and end up
+          visually clipped by the bar on a real notched iPhone even though nothing
+          looks wrong in desktop devtools emulation (which doesn't simulate the
+          safe-area inset at all). */}
+      <div
+        className="flex h-svh w-full flex-col px-6 pt-[var(--result-outer-pad)] sm:h-[calc(100vh-4rem)]"
+        style={{ paddingBottom: 'calc(var(--result-outer-pad) + env(safe-area-inset-bottom))' }}
+      >
         {/* Grows to fill whatever's left over, floored by min-height so it doesn't
             collapse on mobile — but ALSO capped by max-height. Without that cap, a
             very tall screen would grow this box far past what a 300px-wide image

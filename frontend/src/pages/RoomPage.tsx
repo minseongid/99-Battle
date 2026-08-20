@@ -29,7 +29,7 @@ const QUICK_MESSAGE_BURST = 3
 const QUICK_MESSAGE_WINDOW_MS = 4000
 const QUICK_MESSAGES = [
   '반가워요~ 👋',
-  '레디 눌러줘! ⚡',
+  '준비해줘! ⚡',
   '잘 부탁해요! 😊',
   '화이팅! 🔥',
   '굿굿! 👍',
@@ -226,7 +226,15 @@ export default function RoomPage() {
 
   return (
     <PageShell>
-      <div className="relative flex w-full flex-1 flex-col px-5 pt-[var(--room-outer-pad)] pb-[var(--room-outer-pad)]">
+      {/* Extra bottom padding covers env(safe-area-inset-bottom) — on a real notched
+          iPhone, iOS Safari's floating bottom bar sits in that safe-area strip, and
+          without this the quick-message row (and, on a short screen, the ready/start
+          button above it) can end up visually under the bar. Chrome devtools
+          emulation doesn't simulate this inset, so it's invisible there. */}
+      <div
+        className="relative flex w-full flex-1 flex-col px-5 pt-[var(--room-outer-pad)]"
+        style={{ paddingBottom: 'calc(var(--room-outer-pad) + env(safe-area-inset-bottom))' }}
+      >
         {showBattleStart && (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/35 pb-[22%] backdrop-blur-sm">
             <img
@@ -310,7 +318,11 @@ export default function RoomPage() {
                     <PlayerAvatar
                       colorIndex={i}
                       className={`h-[var(--room-avatar)] w-[var(--room-avatar)] ${
-                        isMe ? 'ring-2 ring-[var(--color-primary)] ring-offset-2 ring-offset-[var(--color-bg)]' : ''
+                        p.ready
+                          ? 'ring-2 ring-[var(--color-success)] ring-offset-2 ring-offset-[var(--color-bg)]'
+                          : isMe
+                            ? 'ring-2 ring-[var(--color-primary)] ring-offset-2 ring-offset-[var(--color-bg)]'
+                            : ''
                       }`}
                     />
                     {p.host && (
@@ -318,16 +330,14 @@ export default function RoomPage() {
                         <Crown size={10} />
                       </span>
                     )}
-                    {p.ready && (
-                      <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[var(--color-success)] text-white shadow-sm">
-                        <Check size={12} strokeWidth={3} />
-                      </span>
-                    )}
                   </div>
                   <span className="max-w-full truncate text-xs font-semibold text-[var(--color-ink)]">
                     {p.nickname}
+                    {isMe && <span className="ml-1 text-[var(--color-muted)]">(나)</span>}
                   </span>
-                  {isMe && <span className="text-[10px] font-semibold text-[var(--color-primary)]">나</span>}
+                  {p.ready && (
+                    <span className="text-[10px] font-semibold text-[var(--color-success)]">준비 완료</span>
+                  )}
                 </div>
               )
             }
@@ -420,8 +430,8 @@ export default function RoomPage() {
               {isSolo
                 ? '지금은 혼자예요. 그대로 시작하거나 친구를 기다려보세요!'
                 : canStart
-                  ? '모두 레디를 완료했어요. 게임을 시작해보세요!'
-                  : '모든 팀원이 레디를 완료하면 시작할 수 있어요.'}
+                  ? '모두 준비를 완료했어요. 게임을 시작해보세요!'
+                  : '모든 팀원이 준비를 완료하면 시작할 수 있어요.'}
             </p>
             <button
               type="button"
@@ -437,10 +447,10 @@ export default function RoomPage() {
           <div className="mt-[var(--room-section-gap)] rounded-[var(--radius-card)] bg-[var(--color-surface)] p-[var(--room-pad)] shadow-sm">
             <div className="flex items-center gap-2">
               <Clock size={18} className="text-[var(--color-primary)]" />
-              <span className="font-bold text-[var(--color-ink)]">레디</span>
+              <span className="font-bold text-[var(--color-ink)]">준비</span>
             </div>
             <p className="mt-1.5 text-sm text-[var(--color-muted)]">
-              모두 레디하면 방장이 게임을 시작할 수 있어요!
+              모두 준비하면 방장이 게임을 시작할 수 있어요!
             </p>
             <button
               type="button"
@@ -452,7 +462,7 @@ export default function RoomPage() {
               }`}
             >
               {isReady && <Check size={18} />}
-              {isReady ? '레디 완료' : '레디'}
+              {isReady ? '준비 완료' : '준비'}
             </button>
           </div>
         )}
