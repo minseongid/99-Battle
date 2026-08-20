@@ -318,10 +318,10 @@ export default function RoomPage() {
                     <PlayerAvatar
                       colorIndex={i}
                       className={`h-[var(--room-avatar)] w-[var(--room-avatar)] ${
-                        p.ready
-                          ? 'ring-2 ring-[var(--color-success)] ring-offset-2 ring-offset-[var(--color-bg)]'
-                          : isMe
-                            ? 'ring-2 ring-[var(--color-primary)] ring-offset-2 ring-offset-[var(--color-bg)]'
+                        p.host
+                          ? 'ring-2 ring-[var(--color-primary)] ring-offset-2 ring-offset-[var(--color-bg)]'
+                          : p.ready
+                            ? 'ring-2 ring-[var(--color-success)] ring-offset-2 ring-offset-[var(--color-bg)]'
                             : ''
                       }`}
                     />
@@ -335,9 +335,6 @@ export default function RoomPage() {
                     {p.nickname}
                     {isMe && <span className="ml-1 text-[var(--color-muted)]">(나)</span>}
                   </span>
-                  {p.ready && (
-                    <span className="text-[10px] font-semibold text-[var(--color-success)]">준비 완료</span>
-                  )}
                 </div>
               )
             }
