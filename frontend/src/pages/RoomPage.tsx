@@ -34,7 +34,7 @@ const QUICK_MESSAGES = [
   '화이팅! 🔥',
   '굿굿! 👍',
   '아깝다! 😅',
-  '한 판 더! 🔁',
+  '한 판 더!',
 ]
 
 interface Toast {

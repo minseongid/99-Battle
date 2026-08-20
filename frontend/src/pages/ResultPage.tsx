@@ -37,7 +37,7 @@ const CONFETTI: Array<{ top: string; left: string; rotate: number; color: string
 function getPraise(myRank: number | undefined): { title: string; subtitle: string } {
   if (myRank === 1) return { title: '우승했어요! 최고예요 🏆', subtitle: '압도적인 실력을 보여줬어요!' }
   if (myRank && myRank <= 3) return { title: '메달 획득! 정말 잘했어요 🎉', subtitle: '멋진 실력을 보여줬어요!' }
-  return { title: '모두 수고했어요! 💪', subtitle: '다음엔 더 높은 순위에 도전해봐요!' }
+  return { title: '좋은 승부였어요! 🔥', subtitle: '다음 배틀에서는 더 높은 순위를 노려봐요!' }
 }
 
 export default function ResultPage() {
