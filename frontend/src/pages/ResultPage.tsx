@@ -250,7 +250,11 @@ export default function ResultPage() {
                       style={{ color: getPlayerTextColor(r.colorIndex) }}
                     >
                       {r.nickname}
-                      {isMe && <span className="ml-1 text-[var(--color-muted)]">(나)</span>}
+                      {isMe && (
+                        <span className="ml-1.5 rounded-full bg-[var(--color-primary)] px-1.5 py-0.5 align-middle text-[10px] font-bold text-white">
+                          나
+                        </span>
+                      )}
                       {r.forfeited && <span className="ml-1 text-xs text-[var(--color-muted)]">(기권)</span>}
                     </span>
                     <span

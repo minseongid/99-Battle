@@ -311,7 +311,6 @@ export default function RoomPage() {
           {Array.from({ length: ROOM_CAPACITY }).map((_, i) => {
             const p = room.players[i]
             if (p) {
-              const isMe = p.playerId === playerId
               return (
                 <div key={p.playerId} className="flex flex-col items-center gap-1.5">
                   <div className="relative">
@@ -333,7 +332,6 @@ export default function RoomPage() {
                   </div>
                   <span className="max-w-full truncate text-xs font-semibold text-[var(--color-ink)]">
                     {p.nickname}
-                    {isMe && <span className="ml-1 text-[var(--color-muted)]">(나)</span>}
                   </span>
                 </div>
               )
