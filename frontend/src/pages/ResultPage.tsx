@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { RotateCcw, Home, Crown, Star, Zap } from 'lucide-react'
+import { RotateCcw, Home, Crown, Star, ThumbsUp } from 'lucide-react'
 import { apiGet } from '../lib/api'
 import { getPlayerId } from '../lib/session'
 import { subscribeToGame, subscribeToRoom, sendRematch, sendLeave, registerPresence } from '../lib/ws'
@@ -37,7 +37,7 @@ const CONFETTI: Array<{ top: string; left: string; rotate: number; color: string
 // iconFilled: Medal and Flame both crushed their own internal linework (medal's
 // ribbon+disc split, flame's inner licking-flame line) into an unrecognizable
 // blob once filled solid white at 18px — swapped both for single-shape icons
-// (Star, Zap) that read cleanly filled with nothing to lose.
+// (Star, ThumbsUp) that read cleanly filled with nothing to lose.
 function getPraise(
   myRank: number | undefined
 ): { title: string; subtitle: string; icon: typeof Crown; iconFilled: boolean } {
@@ -48,7 +48,7 @@ function getPraise(
   return {
     title: '좋은 승부였어요! 🔥',
     subtitle: '다음 배틀에서는 더 높은 순위를 노려봐요!',
-    icon: Zap,
+    icon: ThumbsUp,
     iconFilled: true,
   }
 }
