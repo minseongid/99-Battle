@@ -11,6 +11,7 @@ import CustomKeypad from '../components/CustomKeypad'
 import type { GameMessage, MathCategory } from '../types/game'
 
 const MAX_INPUT_LENGTH = 6
+const RESULT_MAX_SLOTS = 6
 
 const CATEGORY_ICON: Record<MathCategory, typeof Triangle> = {
   TRIGONOMETRY: Triangle,
@@ -163,7 +164,7 @@ export default function GamePage() {
         >
           <div className="flex shrink-0 flex-col items-center gap-1 text-center">
             <p className="text-sm font-semibold text-[var(--color-muted)]">정답</p>
-            <p className="text-4xl font-extrabold text-[var(--color-ink)]">{message.correctAnswerDisplay}</p>
+            <p className="text-6xl font-extrabold text-[var(--color-ink)]">{message.correctAnswerDisplay}</p>
             {mine && (
               <p
                 className={`mt-1 text-base font-extrabold ${
@@ -180,11 +181,26 @@ export default function GamePage() {
           </div>
 
           {/* Styled to match the final Result screen's ranking rows (same row
-              padding, font sizes, "나" badge) minus the medal icon and gold/
+              padding, font sizes, "나" badge, fixed 6-slot layout with dashed
+              placeholders for unfilled slots) minus the medal icon and gold/
               silver/bronze tint — ranks here are still provisional mid-game,
-              so looking "final" would be misleading. */}
+              so looking "final" would be misleading. The fixed slot count keeps
+              the card the same height regardless of player count, instead of
+              leaving dead space below a short list. */}
           <div className="mt-4 min-h-0 flex-1 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm">
-            {results.map((r) => {
+            {Array.from({ length: RESULT_MAX_SLOTS }, (_, i) => {
+              const r = results[i]
+              if (!r) {
+                return (
+                  <div key={`empty-${i}`} className="flex items-center gap-2.5 px-3 py-[var(--result-row-pad)] opacity-40">
+                    <span className="flex w-[34px] shrink-0 items-center justify-center text-base font-bold text-[var(--color-muted)]">
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 text-sm text-[var(--color-muted)]">-</span>
+                    <span className="shrink-0 text-base text-[var(--color-muted)]">-</span>
+                  </div>
+                )
+              }
               const isMe = r.playerId === playerId
               return (
                 <div key={r.playerId} className="flex items-center gap-2.5 px-3 py-[var(--result-row-pad)]">
