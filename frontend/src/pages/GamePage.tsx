@@ -35,6 +35,16 @@ export default function GamePage() {
   const [submitted, setSubmitted] = useState(false)
   const [now, setNow] = useState(Date.now())
   const questionKeyRef = useRef<string>('')
+  // The progress bar's own local anchor for "when this question started," set once
+  // per question the instant the client receives it — deliberately NOT the same
+  // clock reference as message.questionStartAtEpochMs. Comparing that server epoch
+  // against the client's Date.now() desyncs the bar whenever the two clocks drift
+  // (common on real devices without tight NTP sync), and at FAST_TEST_MODE's 1s
+  // limits even a few hundred ms of skew is a highly visible chunk of the bar.
+  // Anchoring both sides of the subtraction to the client's own clock keeps the
+  // animation self-consistent; the only remaining offset is network/render
+  // latency (tens of ms), not clock skew (which can be seconds).
+  const localQuestionStartRef = useRef<number>(Date.now())
 
   useEffect(() => {
     playBattleMusic()
@@ -69,6 +79,7 @@ export default function GamePage() {
     const key = `${message.phase}-${message.segmentIndex}-${message.questionIndex}`
     if (message.phase === 'QUESTION' && key !== questionKeyRef.current) {
       questionKeyRef.current = key
+      localQuestionStartRef.current = Date.now()
       setInputValue('')
       setSubmitted(false)
     }
@@ -195,7 +206,11 @@ export default function GamePage() {
                     style={{ color: getPlayerTextColor(r.colorIndex) }}
                   >
                     {r.nickname}
-                    {isMe && <span className="ml-1 text-[var(--color-muted)]">(나)</span>}
+                    {isMe && (
+                      <span className="ml-1.5 rounded-full bg-[var(--color-primary)] px-1.5 py-0.5 align-middle text-[10px] font-bold text-white">
+                        나
+                      </span>
+                    )}
                   </span>
                   <span className="shrink-0 text-sm font-extrabold text-[var(--color-ink)]">{r.totalScore}</span>
                 </div>
@@ -209,8 +224,7 @@ export default function GamePage() {
 
   // QUESTION phase
   const timeLimitMs = (message.timeLimitSeconds ?? 5) * 1000
-  const startAt = message.questionStartAtEpochMs ?? now
-  const remainingMs = Math.max(0, timeLimitMs - (now - startAt))
+  const remainingMs = Math.max(0, timeLimitMs - (now - localQuestionStartRef.current))
   const remainingPct = Math.max(0, Math.min(100, (remainingMs / timeLimitMs) * 100))
   const isUrgent = remainingPct < 30
 
