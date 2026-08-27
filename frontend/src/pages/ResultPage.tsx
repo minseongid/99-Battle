@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { RotateCcw, Home, Trophy, Star, Flame } from 'lucide-react'
+import { RotateCcw, Home, Crown, Star, Zap } from 'lucide-react'
 import { apiGet } from '../lib/api'
 import { getPlayerId } from '../lib/session'
 import { subscribeToGame, subscribeToRoom, sendRematch, sendLeave, registerPresence } from '../lib/ws'
@@ -34,24 +34,22 @@ const CONFETTI: Array<{ top: string; left: string; rotate: number; color: string
   { top: '86%', left: '72%', rotate: 15, color: '#0064fe', size: 8 },
 ]
 
-// iconFilled: the medal icon (lucide's Medal/Award) crushed its own ribbon+disc
-// linework into an unrecognizable white blob at 18px once filled solid — swapped
-// for Star, which reads cleanly filled. Flame has the same flattening problem
-// (its inner licking-flame line disappears when filled), so it's left unfilled
-// (stroke only) to keep that detail visible instead of also going for a swap —
-// there's no better fire-specific icon in lucide to switch to.
+// iconFilled: Medal and Flame both crushed their own internal linework (medal's
+// ribbon+disc split, flame's inner licking-flame line) into an unrecognizable
+// blob once filled solid white at 18px — swapped both for single-shape icons
+// (Star, Zap) that read cleanly filled with nothing to lose.
 function getPraise(
   myRank: number | undefined
-): { title: string; subtitle: string; icon: typeof Trophy; iconFilled: boolean } {
+): { title: string; subtitle: string; icon: typeof Crown; iconFilled: boolean } {
   if (myRank === 1)
-    return { title: '우승했어요! 최고예요 🏆', subtitle: '압도적인 실력을 보여줬어요!', icon: Trophy, iconFilled: true }
+    return { title: '우승했어요! 최고예요 🏆', subtitle: '압도적인 실력을 보여줬어요!', icon: Crown, iconFilled: true }
   if (myRank && myRank <= 3)
     return { title: '메달 획득! 정말 잘했어요 🎉', subtitle: '멋진 실력을 보여줬어요!', icon: Star, iconFilled: true }
   return {
     title: '좋은 승부였어요! 🔥',
     subtitle: '다음 배틀에서는 더 높은 순위를 노려봐요!',
-    icon: Flame,
-    iconFilled: false,
+    icon: Zap,
+    iconFilled: true,
   }
 }
 
