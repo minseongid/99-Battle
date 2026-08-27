@@ -5,10 +5,9 @@ import { apiGet } from '../lib/api'
 import { getPlayerId } from '../lib/session'
 import { subscribeToGame, sendAnswer, registerPresence } from '../lib/ws'
 import { playBattleMusic, stopBattleMusic } from '../lib/audio'
-import { getPlayerColor, getPlayerTextColor } from '../lib/playerColors'
+import { getPlayerTextColor } from '../lib/playerColors'
 import PageShell from '../components/PageShell'
 import CustomKeypad from '../components/CustomKeypad'
-import penguinIcon from '../assets/penguin-icon.png'
 import type { GameMessage, MathCategory } from '../types/game'
 
 const MAX_INPUT_LENGTH = 6
@@ -35,6 +34,7 @@ export default function GamePage() {
   const [submitted, setSubmitted] = useState(false)
   const [now, setNow] = useState(Date.now())
   const questionKeyRef = useRef<string>('')
+  const timerKeyRef = useRef<string>('')
   // The progress bar's own local anchor for "when this question started," set once
   // per question the instant the client receives it — deliberately NOT the same
   // clock reference as message.questionStartAtEpochMs. Comparing that server epoch
@@ -79,7 +79,6 @@ export default function GamePage() {
     const key = `${message.phase}-${message.segmentIndex}-${message.questionIndex}`
     if (message.phase === 'QUESTION' && key !== questionKeyRef.current) {
       questionKeyRef.current = key
-      localQuestionStartRef.current = Date.now()
       setInputValue('')
       setSubmitted(false)
     }
@@ -162,19 +161,17 @@ export default function GamePage() {
           className="flex w-full flex-1 flex-col px-5 pt-[var(--game-outer-pad)]"
           style={{ paddingBottom: 'calc(var(--game-outer-pad) + env(safe-area-inset-bottom))' }}
         >
-          <div className="flex flex-col items-center gap-1 text-center">
-            <p className="text-xs font-semibold text-[var(--color-muted)]">{message.questionText}</p>
-            <p className="text-sm text-[var(--color-muted)]">
-              정답 <span className="font-bold text-[var(--color-ink)]">{message.correctAnswerDisplay}</span>
-            </p>
+          <div className="flex shrink-0 flex-col items-center gap-1 text-center">
+            <p className="text-sm font-semibold text-[var(--color-muted)]">정답</p>
+            <p className="text-4xl font-extrabold text-[var(--color-ink)]">{message.correctAnswerDisplay}</p>
             {mine && (
               <p
-                className={`mt-1 text-lg font-extrabold ${
+                className={`mt-1 text-base font-extrabold ${
                   mine.correct ? 'text-[var(--color-success)]' : 'text-[var(--color-error)]'
                 }`}
               >
                 {mine.timedOut ? '시간 초과!' : mine.correct ? '정답이에요!' : '틀렸어요!'}
-                <span className="ml-2 text-base">
+                <span className="ml-2 text-sm">
                   {mine.pointsDelta >= 0 ? '+' : ''}
                   {mine.pointsDelta}
                 </span>
@@ -182,25 +179,18 @@ export default function GamePage() {
             )}
           </div>
 
-          <div className="mt-4 flex flex-1 flex-col gap-1.5 overflow-y-auto">
+          {/* Styled to match the final Result screen's ranking rows (same row
+              padding, font sizes, "나" badge) minus the medal icon and gold/
+              silver/bronze tint — ranks here are still provisional mid-game,
+              so looking "final" would be misleading. */}
+          <div className="mt-4 min-h-0 flex-1 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm">
             {results.map((r) => {
               const isMe = r.playerId === playerId
               return (
-                <div
-                  key={r.playerId}
-                  className={`flex items-center gap-2.5 rounded-[var(--radius-card)] px-3 py-2 ${
-                    isMe ? 'bg-[#eef4ff]' : 'bg-[var(--color-surface)]'
-                  }`}
-                >
-                  <span className="w-5 shrink-0 text-center text-xs font-bold text-[var(--color-muted)]">
+                <div key={r.playerId} className="flex items-center gap-2.5 px-3 py-[var(--result-row-pad)]">
+                  <span className="flex w-[34px] shrink-0 items-center justify-center text-base font-bold text-[var(--color-muted)]">
                     {r.rank}
                   </span>
-                  <div
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-                    style={{ backgroundColor: getPlayerColor(r.colorIndex) }}
-                  >
-                    <img src={penguinIcon} alt="" className="h-full w-full object-contain" />
-                  </div>
                   <span
                     className="min-w-0 flex-1 truncate text-sm font-bold"
                     style={{ color: getPlayerTextColor(r.colorIndex) }}
@@ -212,7 +202,9 @@ export default function GamePage() {
                       </span>
                     )}
                   </span>
-                  <span className="shrink-0 text-sm font-extrabold text-[var(--color-ink)]">{r.totalScore}</span>
+                  <span className="shrink-0 text-base font-extrabold text-[var(--color-primary)]">
+                    {r.totalScore}점
+                  </span>
                 </div>
               )
             })}
@@ -223,6 +215,18 @@ export default function GamePage() {
   }
 
   // QUESTION phase
+  // Setting the ref here — during render, not inside a useEffect — is deliberate:
+  // an effect only runs AFTER this component has already painted once with the
+  // new question's data but the OLD ref value, so the bar would flash to ~0%
+  // (computed against the previous question's stale start time) for one frame
+  // before the effect corrects it on the next tick — exactly the "snaps back to
+  // full very fast" glitch this was built to fix. Updating the ref inline means
+  // the very first render of a new question already uses the correct start time.
+  const timerKey = `${message.segmentIndex}-${message.questionIndex}`
+  if (timerKey !== timerKeyRef.current) {
+    timerKeyRef.current = timerKey
+    localQuestionStartRef.current = Date.now()
+  }
   const timeLimitMs = (message.timeLimitSeconds ?? 5) * 1000
   const remainingMs = Math.max(0, timeLimitMs - (now - localQuestionStartRef.current))
   const remainingPct = Math.max(0, Math.min(100, (remainingMs / timeLimitMs) * 100))
