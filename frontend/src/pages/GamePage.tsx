@@ -46,11 +46,25 @@ export default function GamePage() {
   // animation self-consistent; the only remaining offset is network/render
   // latency (tens of ms), not clock skew (which can be seconds).
   const localQuestionStartRef = useRef<number>(Date.now())
+  const battleMusicStartedRef = useRef(false)
 
   useEffect(() => {
-    playBattleMusic()
     return () => stopBattleMusic()
   }, [])
+
+  // Wait for the first QUESTION message rather than picking a track on mount:
+  // questionStartAtEpochMs is a server timestamp broadcast identically to every
+  // player, so seeding the track choice with it (plus roomId) makes every
+  // client land on the same index — a bare Math.random() on each client
+  // (the old behavior) meant everyone in the same game likely heard a
+  // different song. The ref guard fires this at most once per game mount.
+  useEffect(() => {
+    if (battleMusicStartedRef.current || !message || !roomId) return
+    if (message.phase === 'QUESTION' && message.questionStartAtEpochMs != null) {
+      battleMusicStartedRef.current = true
+      playBattleMusic(`${roomId}-${message.questionStartAtEpochMs}`)
+    }
+  }, [message, roomId])
 
   useEffect(() => {
     if (!roomId) return
@@ -159,7 +173,7 @@ export default function GamePage() {
             real notched iPhone — invisible in desktop devtools emulation, which
             doesn't simulate the inset. */}
         <div
-          className="flex w-full flex-1 flex-col px-5 pt-[var(--game-outer-pad)]"
+          className="flex w-full flex-1 flex-col justify-center px-5 pt-[var(--game-outer-pad)]"
           style={{ paddingBottom: 'calc(var(--game-outer-pad) + env(safe-area-inset-bottom))' }}
         >
           <div className="flex shrink-0 flex-col items-center gap-1 text-center">
@@ -186,8 +200,12 @@ export default function GamePage() {
               silver/bronze tint — ranks here are still provisional mid-game,
               so looking "final" would be misleading. The fixed slot count keeps
               the card the same height regardless of player count, instead of
-              leaving dead space below a short list. */}
-          <div className="mt-4 min-h-0 flex-1 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm">
+              leaving dead space below a short list. shrink-0 (not flex-1) so it
+              sizes to its own fixed 6-row height rather than stretching to fill
+              the page — the parent's justify-center then centers this whole
+              info+list block vertically instead of it all sitting glued to the
+              top with empty space below. */}
+          <div className="mt-4 shrink-0 divide-y divide-[var(--color-border)] overflow-y-auto rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-sm">
             {Array.from({ length: RESULT_MAX_SLOTS }, (_, i) => {
               const r = results[i]
               if (!r) {

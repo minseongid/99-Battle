@@ -55,14 +55,29 @@ export function stopLobbyMusic() {
   }
 }
 
-/** Picks a random track from BATTLE_MUSIC_SRCS and loops it for this game. */
-export function playBattleMusic() {
+/** Deterministic string hash (djb2-ish) so every client picks the identical
+ * track index from the same seed, with no server coordination needed. */
+function hashSeed(seed: string): number {
+  let hash = 5381
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 33 + seed.charCodeAt(i)) | 0
+  }
+  return Math.abs(hash)
+}
+
+/** Picks a track from BATTLE_MUSIC_SRCS and loops it for this game. Pass a
+ * `seed` (e.g. roomId + the first question's server-broadcast timestamp) so
+ * every player in the same game session lands on the same index — without a
+ * seed it falls back to a per-client random pick (unsynced across players). */
+export function playBattleMusic(seed?: string) {
   stopLobbyMusic()
   if (battleAudioEl) {
     battleAudioEl.pause()
   }
   if (isBattleMusicMuted()) return
-  const src = BATTLE_MUSIC_SRCS[Math.floor(Math.random() * BATTLE_MUSIC_SRCS.length)]
+  const index =
+    seed !== undefined ? hashSeed(seed) % BATTLE_MUSIC_SRCS.length : Math.floor(Math.random() * BATTLE_MUSIC_SRCS.length)
+  const src = BATTLE_MUSIC_SRCS[index]
   battleAudioEl = new Audio(src)
   battleAudioEl.loop = true
   battleAudioEl.volume = VOLUME
